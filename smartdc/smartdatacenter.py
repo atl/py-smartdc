@@ -1,3 +1,4 @@
+import sys
 import json
 
 import requests
@@ -14,7 +15,7 @@ DEFAULT_HEADERS = {'Accept': 'application/json',
     'X-Api-Version': API_VERSION
 }
 
-class DataCenterConnection(object):
+class DataCenter(object):
     def __init__(self, location=None, key_id=None, secret=None, headers=None, login=None):
         self.location = location or DEFAULT_LOCATION
         self.host = self.location + API_HOST_SUFFIX
@@ -38,11 +39,12 @@ class DataCenterConnection(object):
     
     def request(self, method, path, headers=None, **kwargs):
         full_path = self.base_url + path
+        config = {'verbose': sys.stderr}
         request_headers = {}
         request_headers.update(self.default_headers)
         if headers:
             request_headers.update(headers)
-        resp = requests.request(method, full_path, auth=self.auth, headers=request_headers, **kwargs)
+        resp = requests.request(method, full_path, auth=self.auth, headers=request_headers, config=config, **kwargs)
         if 400 <= resp.status_code < 499:
             resp.raise_for_status()
         if resp.content:
@@ -55,16 +57,46 @@ class DataCenterConnection(object):
         return j
     
     def key(self, key_id):
-        j, _ = self.request('GET', 'keys/' + key_id)
+        j, _ = self.request('GET', 'keys/' + str(key_id))
         return j
     
     def add_key(self, key_id, key):
-        data = json.dumps({'name': key_id, 'key': key})
+        data = json.dumps({'name': str(key_id), 'key': str(key)})
         j, _ = self.request('POST', 'keys', data=data)
         return j
     
     def delete_key(self, key_id):
-        j, r = self.request('DELETE', 'keys/' + key_id)
+        j, r = self.request('DELETE', 'keys/' + str(key_id))
         r.raise_for_status()
         return j
     
+    def datacenters(self):
+        j, _ = self.request('GET', 'datacenters')
+        return j
+    
+    def datacenter(self, name):
+        # j, _ = self.request('GET', 'datacenters/' + str(name))
+        dc = DataCenter(location=name, headers=self.default_headers, login=self.login)
+        dc.auth = self.auth
+        return dc
+    
+    def datasets(self):
+        j, _ = self.request('GET', 'datasets')
+        return j
+    
+    def dataset(self, dataset_id):
+        if isinstance(dataset_id, dict):
+            dataset_id = dataset_id['id']
+        j, _ = self.request('GET', 'datasets/' + str(dataset_id))
+        return j
+    
+    def packages(self):
+        j, _ = self.request('GET', 'packages')
+        return j
+    
+    def package(self, name):
+        if isinstance(name, dict):
+            name = name['name']
+        j, _ = self.request('GET', 'packages/' + str(name))
+    
+

@@ -1,1 +1,1 @@
-from .smartdatacenter import DataCenterConnection
+from .smartdatacenter import DataCenter
