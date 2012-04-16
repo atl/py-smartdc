@@ -98,5 +98,6 @@ class DataCenter(object):
         if isinstance(name, dict):
             name = name['name']
         j, _ = self.request('GET', 'packages/' + str(name))
+        return j
     
 
