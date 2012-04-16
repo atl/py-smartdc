@@ -134,67 +134,133 @@ class DataCenter(object):
     def machines(self, machine_type=None, name=None, dataset=None, state=None, 
             memory=None, tombstone=None, tag_dict=None, credentials=False, 
             paged=False, limit=None, offset=None):
-        data = {}
+        params = {}
         if machine_type:
-            data['type'] = machine_type
+            params['type'] = machine_type
         if name:
-            data['name'] = name
+            params['name'] = name
         if dataset:
-            data['dataset'] = dataset
+            params['dataset'] = dataset
         if state:
-            data['state'] = state
+            params['state'] = state
         if memory:
-            data['memory'] = memory
+            params['memory'] = memory
         if tombstone:
-            data['tombstone'] = tombstone
+            params['tombstone'] = tombstone
         if tag_dict:
             for k, v in tag_dict.items():
-                data['tag.' + str(k)] = v
+                params['tag.' + str(k)] = v
         if credentials:
-            data['credentials'] = True
+            params['credentials'] = True
         if limit:
-            data['limit'] = limit
+            params['limit'] = limit
         else:
             limit = 1000
         if offset:
-            data['offset'] = offset
+            params['offset'] = offset
         else:
             offset = 0
         machines = []
         while True:
-            j, r = self.request('GET', 'machines', params=data)
+            j, r = self.request('GET', 'machines', params=params)
             machines.extend(j)
             if not paged:
-                query_limit = r.headers['x-query-limit']
-                resource_count = r.headers['x-resource-count']
-                if resource_count < query_limit:
-                    data['offset'] += data['limit']
-                else: 
+                query_limit = int(r.headers['x-query-limit'])
+                resource_count = int(r.headers['x-resource-count'])
+                if resource_count > query_limit:
+                    data['offset'] = params.get('offset', offset) + params.get('limit', limit)
+                else:
                     break
             else:
                 break
-        return [Machine(data_dict=m, datacenter=self) for m in machines]
+        return [Machine(data=m, datacenter=self) for m in machines]
     
+    def create_machine(self, name=None, package=None, dataset=None,
+            metadata_dict=None, tag_dict=None):
+        params = {}
+        if name:
+            params['name'] = name
+        if package:
+            params['package'] = package
+        if dataset:
+            params['dataset'] = dataset
+        if metadata_dict:
+            for k, v in metadata_dict.items():
+                params['metadata.' + str(k)] = v
+        if tag_dict:
+            for k, v in tag_dict.items():
+                params['tag.' + str(k)] = v
+        j, r = self.request('POST', 'machines', params=params)
+        return Machine(j, self)
 
 class Machine(object):
-    def __init__(self, data_dict=None, datacenter=None, machine_id=None):
-        self.id = machine_id or data_dict.pop('id')
+    def __init__(self, data=None, datacenter=None, machine_id=None):
+        self.id = machine_id or data.pop('id')
         self.datacenter = datacenter
-        if not data_dict:
-            data_dict = self.datacenter.raw_machine_data(self.id)
-        if data_dict:
-            self.name = data_dict.get('name')
-            self.type = data_dict.get('type')
-            self.state = data_dict.get('state')
-            self.dataset = data_dict.get('dataset')
-            self.memory = data_dict.get('memory')
-            self.disk = data_dict.get('disk')
-            self.ips = data_dict.get('ips', [])
-            self.metadata = data_dict.get('metadata', {})
-            self.created = data_dict.get('created')
-            self.updated = data_dict.get('updated')
+        if not data:
+            data = self.datacenter.raw_machine_data(self.id)
+        self._save(data)
     
     def __str__(self):
         return self.id
     
+    def __repr__(self):
+        if self.datacenter:
+            dc = self.datacenter.location
+        else:
+            dc = 'None'
+        return '<{module}.{cls}: <{name}> at <{loc}>>'.format(module=self.__module__,
+            cls=self.__class__.__name__, name=self.name, loc=self.datacenter.location)
     
+    def _save(self, data):
+        self.name = data.get('name')
+        self.type = data.get('type')
+        self.state = data.get('state')
+        self.dataset = data.get('dataset')
+        self.memory = data.get('memory')
+        self.disk = data.get('disk')
+        self.ips = data.get('ips', [])
+        self.metadata = data.get('metadata', {})
+        self.created = data.get('created')
+        self.updated = data.get('updated')
+    
+    def update(self):
+        data = self.datacenter.raw_machine_data(self.id)
+        self._save(data)
+    
+    @property
+    def path(self):
+        return 'machines/{id}'.format(id=self.id)
+    
+    def stop(self):
+        action = {'action': 'stop'}
+        j, r = self.datacenter.request('POST', self.path, params=action)
+        r.raise_for_status()
+    
+    def start(self):
+        action = {'action': 'start'}
+        j, r = self.datacenter.request('POST', self.path, params=action)
+        r.raise_for_status()
+    
+    def reboot(self):
+        action = {'action': 'reboot'}
+        j, r = self.datacenter.request('POST', self.path, params=action)
+        r.raise_for_status()
+    
+    def resize(self, package):
+        if isinstance(package, dict):
+            package = package['name']
+        action = {'action': 'resize',
+                  'package': package}
+        j, r = self.datacenter.request('POST', self.path, params=action)
+        r.raise_for_status()
+    
+    def status(self):
+        self.update()
+        return self.state
+    
+    def delete(self):
+        j, r = self.datacenter.request('DELETE', self.path)
+        r.raise_for_status()
+    
+
