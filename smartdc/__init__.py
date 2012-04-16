@@ -1,1 +1,3 @@
-from .smartdatacenter import DataCenter
+from .datacenter import DataCenter
+from .machine import Machine
+
