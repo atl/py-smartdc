@@ -10,10 +10,9 @@ LOCATIONS = ['us-east-1', 'us-west-1', 'us-sw-1', 'eu-ams-1']
 DEFAULT_LOCATION = LOCATIONS[1]
 
 DEFAULT_HEADERS = {'Accept': 'application/json',
-'Content-Type': 'application/json; charset=UTF-8',
-'X-Api-Version': API_VERSION}
-
-REQUEST_URL = 'https://{location}{host_suffix}/{login}/{resource}'
+    'Content-Type': 'application/json; charset=UTF-8',
+    'X-Api-Version': API_VERSION
+}
 
 class DataCenterConnection(object):
     def __init__(self, location=None, key_id=None, secret=None, headers=None, login=None):
