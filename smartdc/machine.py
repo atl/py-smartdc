@@ -31,7 +31,7 @@ class Machine(object):
         self.created = data.get('created')
         self.updated = data.get('updated')
     
-    def update(self):
+    def refresh(self):
         data = self.datacenter.raw_machine_data(self.id)
         self._save(data)
     
@@ -63,7 +63,7 @@ class Machine(object):
         r.raise_for_status()
     
     def status(self):
-        self.update()
+        self.refresh()
         return self.state
     
     def delete(self):
