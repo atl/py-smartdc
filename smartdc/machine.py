@@ -69,6 +69,6 @@ class Machine(object):
         r.raise_for_status()
     
     @classmethod
-    def new_from_specification(cls, datacenter, **kwargs):
+    def create_in_datacenter(cls, datacenter, **kwargs):
         return datacenter.create_machine(**kwargs)
 
