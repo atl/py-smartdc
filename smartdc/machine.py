@@ -1,5 +1,8 @@
 import time
 
+priv = lambda(x): x.startswith((u'192.168.', u'10.', u'172.'))
+pub  = lambda(x): not priv(x)
+
 class Machine(object):
     def __init__(self, data=None, datacenter=None, machine_id=None):
         self.id = machine_id or data.pop('id')
@@ -38,6 +41,14 @@ class Machine(object):
     @property
     def path(self):
         return 'machines/{id}'.format(id=self.id)
+    
+    @property
+    def public_ips(self):
+        return filter(pub, self.ips)
+    
+    @property
+    def private_ips(self):
+        return filter(priv, self.ips)
     
     def stop(self):
         action = {'action': 'stop'}
@@ -101,4 +112,25 @@ class Machine(object):
         j, r = self.datacenter.request('DELETE', self.path + '/metadata')
         r.raise_for_status()
         return self.get_metadata()
+    
+    def get_tags(self):
+        j, _ = self.datacenter.request('GET', self.path + '/tags')
+        return j
+    
+    def add_tags(self, **kwargs):
+        j, _ = self.datacenter.request('POST', self.path + '/tags', params=kwargs)
+        return j
+    
+    def get_tag(self, tag):
+        headers = {'Accept': 'text/plain'}
+        j, _ = self.datacenter.request('GET', self.path + '/tags/' + tag)
+        return j
+    
+    def delete_tag(self, tag):
+        j, r = self.datacenter.request('DELETE', self.path + '/tags/' + tag)
+        r.raise_for_status()
+    
+    def delete_all_tags(self):
+        j, r = self.datacenter.request('DELETE', self.path + '/tags')
+        r.raise_for_status()
 
