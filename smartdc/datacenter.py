@@ -10,10 +10,10 @@ API_HOST_SUFFIX = '.api.joyentcloud.com'
 API_VERSION = '~6.5'
 
 KNOWN_LOCATIONS = {
-    'us-east-1': 'us-east-1.api.joyentcloud.com',
-    'us-sw-1':   'us-sw-1.api.joyentcloud.com',
-    'us-west-1': 'us-west-1.api.joyentcloud.com',
-    'eu-ams-1':  'eu-ams-1.api.joyentcloud.com',
+    u'us-east-1': u'https://us-east-1.api.joyentcloud.com',
+    u'us-sw-1':   u'https://us-sw-1.api.joyentcloud.com',
+    u'us-west-1': u'https://us-west-1.api.joyentcloud.com',
+    u'eu-ams-1':  u'https://eu-ams-1.api.joyentcloud.com',
 }
 
 DEFAULT_LOCATION = 'us-west-1'
@@ -32,11 +32,11 @@ class DataCenter(object):
         self.location = location or DEFAULT_LOCATION
         self.known_locations = known_locations or KNOWN_LOCATIONS
         if self.location in self.known_locations:
-            self.host = self.known_locations[self.location]
+            self.base_url = self.known_locations[self.location]
         elif '.' in self.location or self.location == 'localhost':
-            self.host = self.location
+            self.base_url = 'https://' + self.location
         else:
-            self.host = self.location + API_HOST_SUFFIX
+            self.base_url = 'https://' + self.location + API_HOST_SUFFIX
         self.config = config or {}
         if key_id and secret:
             self.auth = HTTPSignatureAuth(key_id=key_id, secret=secret)
@@ -51,15 +51,15 @@ class DataCenter(object):
             self.login = 'my'
     
     @property
-    def base_url(self):
-        return 'https://{host}/{login}/'.format(host=self.host, login=self.login)
+    def url(self):
+        return '{base_url}/{login}/'.format(base_url=self.base_url, login=self.login)
     
     def authenticate(self, key_id=None, secret=None):
         if key_id and secret:
             self.auth = HTTPSignatureAuth(key_id=key_id, secret=secret)
     
     def request(self, method, path, headers=None, **kwargs):
-        full_path = self.base_url + path
+        full_path = self.url + path
         request_headers = {}
         request_headers.update(self.default_headers)
         if headers:
@@ -74,8 +74,7 @@ class DataCenter(object):
             return (None, resp)
     
     def api(self):
-        resp = requests.request('GET', 'https://{location}{host_suffix}/'.format(
-                location=self.location, host_suffix=API_HOST_SUFFIX))
+        resp = requests.request('GET', self.base_url)
         if 400 <= resp.status_code < 499:
             resp.raise_for_status()
         if resp.content:
@@ -107,6 +106,7 @@ class DataCenter(object):
     
     def datacenters(self):
         j, _ = self.request('GET', 'datacenters')
+        self.known_locations.update(j)
         return j
     
     def datacenter(self, name):
