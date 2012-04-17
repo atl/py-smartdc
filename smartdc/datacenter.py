@@ -142,6 +142,8 @@ class DataCenter(object):
         if name:
             params['name'] = name
         if dataset:
+            if isinstance(dataset, dict):
+                dataset = dataset['id']
             params['dataset'] = dataset
         if state:
             params['state'] = state
@@ -183,8 +185,12 @@ class DataCenter(object):
         if name:
             params['name'] = name
         if package:
+            if isinstance(package, dict):
+                package = package['name']
             params['package'] = package
         if dataset:
+            if isinstance(dataset, dict):
+                dataset = dataset['id']
             params['dataset'] = dataset
         if metadata_dict:
             for k, v in metadata_dict.items():
