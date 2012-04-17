@@ -85,7 +85,10 @@ class DataCenter(object):
         if 400 <= resp.status_code < 499:
             resp.raise_for_status()
         if resp.content:
-            return (json.loads(resp.content), resp)
+            if resp.headers['content-type'] == 'application/json':
+                return (json.loads(resp.content), resp)
+            else:
+                return (resp.content, resp)
         else:
             return (None, resp)
     
