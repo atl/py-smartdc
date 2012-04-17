@@ -68,4 +68,7 @@ class Machine(object):
         j, r = self.datacenter.request('DELETE', self.path)
         r.raise_for_status()
     
+    @classmethod
+    def new_from_specification(cls, datacenter, **kwargs):
+        return datacenter.create_machine(**kwargs)
 
