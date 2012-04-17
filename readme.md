@@ -29,17 +29,13 @@ This is a third-party effort.
     
     nu = east.create_image()
     
-    import time
+    nu.poll_while('provisioning')
     
-    while nu.status() == 'provisioning':
-        time.sleep(2)
-        print '.',
+    nu.state
     
     nu.stop()
     
-    while nu.status() != 'stopped':
-        time.sleep(2)
-        print '.',
+    nu.poll_until('stopped')
     
     nu.delete()
 

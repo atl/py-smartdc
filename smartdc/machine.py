@@ -1,3 +1,5 @@
+import time
+
 class Machine(object):
     def __init__(self, data=None, datacenter=None, machine_id=None):
         self.id = machine_id or data.pop('id')
@@ -71,4 +73,14 @@ class Machine(object):
     @classmethod
     def create_in_datacenter(cls, datacenter, **kwargs):
         return datacenter.create_machine(**kwargs)
+    
+    def poll_until(self, state, interval=2):
+        while self.status() != state:
+            time.sleep(interval)
+    
+    def poll_while(self, state, interval=2):
+        while self.status() == state:
+            time.sleep(interval)
+    
+    
 
