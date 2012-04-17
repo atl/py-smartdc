@@ -28,10 +28,11 @@ DEBUG_CONFIG = {'verbose': sys.stderr}
 
 class DataCenter(object):
     def __init__(self, location=None, key_id=None, secret=None, 
-                headers=None, login=None, config=None):
+                headers=None, login=None, config=None, known_locations=None):
         self.location = location or DEFAULT_LOCATION
-        if self.location in KNOWN_LOCATIONS:
-            self.host = KNOWN_LOCATIONS[self.location]
+        self.known_locations = known_locations or KNOWN_LOCATIONS
+        if self.location in self.known_locations:
+            self.host = self.known_locations[self.location]
         elif '.' in self.location or self.location == 'localhost':
             self.host = self.location
         else:
