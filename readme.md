@@ -26,6 +26,23 @@ This is a third-party effort.
     east = sdc.datacenter('us-east-1')
     
     east.package('Small 1GB')
+    
+    nu = east.create_image()
+    
+    import time
+    
+    while nu.status() == 'provisioning':
+        time.sleep(2)
+        print '.',
+    
+    nu.stop()
+    
+    while nu.status() != 'stopped':
+        time.sleep(2)
+        print '.',
+    
+    nu.delete()
+
 
 ## Why?
 
