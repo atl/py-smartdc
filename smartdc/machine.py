@@ -96,4 +96,9 @@ class Machine(object):
         j, r = self.datacenter.request('DELETE', self.path + '/metadata/' + key)
         r.raise_for_status()
         return self.get_metadata()
+    
+    def delete_all_metadata(self):
+        j, r = self.datacenter.request('DELETE', self.path + '/metadata')
+        r.raise_for_status()
+        return self.get_metadata()
 
