@@ -133,4 +133,62 @@ class Machine(object):
     def delete_all_tags(self):
         j, r = self.datacenter.request('DELETE', self.path + '/tags')
         r.raise_for_status()
+    
+    def raw_snapshot_data(self, name):
+        j, _ = self.datacenter.request('GET', self.path + '/snapshots/' + str(name))
+        return j
+    
+    def snapshots(self):
+        j, _ = self.datacenter.request('GET', self.path + '/snapshots')
+        return [Snapshot(machine=self, data=s) for s in j]
+    
+    def create_snapshot(self, name):
+        params = {'name': name}
+        j, _ = self.datacenter.request('POST', self.path + '/snapshots', params=params)
+        return Snapshot(machine=self, data=j, name=name)
+    
+    def start_snapshot(self, name):
+        _, r = self.datacenter.request('POST', self.path + '/snapshots/' + str(name))
+        r.raise_for_status()
+    
 
+class Snapshot(object):
+    def __init__(self, machine=None, data=None, name=None):
+        self.name = name or data.pop('name')
+        self.machine = machine
+        if not data:
+            data = self.machine.raw_snapshot_data(self.name)
+        self._save(data)
+    
+    def __str__(self):
+        return self.name
+    
+    def __repr__(self):
+        return '<{module}.{cls}: <{name}> on <Machine: {mach}>>'.format(module=self.__module__,
+            cls=self.__class__.__name__, name=self.name, mach=str(self.machine.name))
+    
+    def _save(self, data):
+        self.state = data.get('state')
+        self.created = data.get('created')
+        self.updated = data.get('updated')
+    
+    @property
+    def path(self):
+        return self.machine.path + '/snapshots/' + self.name
+    
+    def refresh(self):
+        data = self.machine.raw_snapshot_data(self.name)
+        self._save(data)
+    
+    def status(self):
+        self.refresh()
+        return self.state
+    
+    def delete(self):
+        _, r = self.machine.datacenter.request('DELETE', self.path)
+        r.raise_for_status()
+    
+    def start(self):
+        _, r = self.machine.datacenter.request('POST', self.path)
+        r.raise_for_status()
+    
