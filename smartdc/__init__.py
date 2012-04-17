@@ -1,3 +1,3 @@
-from .datacenter import DataCenter
+from .datacenter import DataCenter, DEBUG_CONFIG
 from .machine import Machine
 

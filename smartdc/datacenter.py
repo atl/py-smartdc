@@ -9,22 +9,34 @@ from .machine import Machine
 API_HOST_SUFFIX = '.api.joyentcloud.com'
 API_VERSION = '~6.5'
 
-LOCATIONS = ['us-east-1', 'us-west-1', 'us-sw-1', 'eu-ams-1']
-DEFAULT_LOCATION = LOCATIONS[1]
+KNOWN_LOCATIONS = {
+    'us-east-1': 'us-east-1.api.joyentcloud.com',
+    'us-sw-1':   'us-sw-1.api.joyentcloud.com',
+    'us-west-1': 'us-west-1.api.joyentcloud.com',
+    'eu-ams-1':  'eu-ams-1.api.joyentcloud.com',
+}
 
-DEFAULT_HEADERS = {'Accept': 'application/json',
-    'Content-Type': 'application/json; charset=UTF-8',
+DEFAULT_LOCATION = 'us-west-1'
+
+DEFAULT_HEADERS = {
+    'Accept':        'application/json',
+    'Content-Type':  'application/json; charset=UTF-8',
     'X-Api-Version': API_VERSION
 }
 
-DEFAULT_CONFIG = {'verbose': sys.stderr}
+DEBUG_CONFIG = {'verbose': sys.stderr}
 
 class DataCenter(object):
     def __init__(self, location=None, key_id=None, secret=None, 
                 headers=None, login=None, config=None):
         self.location = location or DEFAULT_LOCATION
-        self.host = self.location + API_HOST_SUFFIX
-        self.config = config or DEFAULT_CONFIG
+        if self.location in KNOWN_LOCATIONS:
+            self.host = KNOWN_LOCATIONS[self.location]
+        elif '.' in self.location or self.location == 'localhost':
+            self.host = self.location
+        else:
+            self.host = self.location + API_HOST_SUFFIX
+        self.config = config or {}
         if key_id and secret:
             self.auth = HTTPSignatureAuth(key_id=key_id, secret=secret)
         else:
@@ -39,8 +51,7 @@ class DataCenter(object):
     
     @property
     def base_url(self):
-        return 'https://{location}{host_suffix}/{login}/'.format(
-            location=self.location, host_suffix=API_HOST_SUFFIX, login=self.login)
+        return 'https://{host}/{login}/'.format(host=self.host, login=self.login)
     
     def authenticate(self, key_id=None, secret=None):
         if key_id and secret:
@@ -89,6 +100,8 @@ class DataCenter(object):
     
     def me(self):
         j, _ = self.request('GET', '')
+        if 'login' in j and self.login == 'my':
+            self.login = j['login']
         return j
     
     def datacenters(self):
