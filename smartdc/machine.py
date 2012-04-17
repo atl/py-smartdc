@@ -82,5 +82,18 @@ class Machine(object):
         while self.status() == state:
             time.sleep(interval)
     
+    def get_metadata(self):
+        j, _ = self.datacenter.request('GET', self.path + '/metadata')
+        self.metadata = j
+        return j
     
+    def update_metadata(self, **kwargs):
+        j, _ = self.datacenter.request('POST', self.path + '/metadata', params=kwargs)
+        self.metadata = j
+        return j
+    
+    def delete_metadata_at_key(self, key):
+        j, r = self.datacenter.request('DELETE', self.path + '/metadata/' + key)
+        r.raise_for_status()
+        return self.get_metadata()
 
