@@ -13,11 +13,11 @@ class Machine(object):
     
     def __repr__(self):
         if self.datacenter:
-            dc = self.datacenter.location
+            dc = str(self.datacenter)
         else:
-            dc = 'None'
-        return '<{module}.{cls}: <{name}> at <{loc}>>'.format(module=self.__module__,
-            cls=self.__class__.__name__, name=self.name, loc=self.datacenter.location)
+            dc = '<None>'
+        return '<{module}.{cls}: <{name}> in {dc}>'.format(module=self.__module__,
+            cls=self.__class__.__name__, name=self.name, dc=dc)
     
     def _save(self, data):
         self.name = data.get('name')

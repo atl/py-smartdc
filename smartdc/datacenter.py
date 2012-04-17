@@ -50,6 +50,22 @@ class DataCenter(object):
         else:
             self.login = 'my'
     
+    def __str__(self):
+        if self.login != 'my':
+            user_string = self.login + '@'
+        else:
+            user_string = ''
+        return '<{cls}: {user_string}{location}>'.format(cls=self.__class__.__name__,
+            user_string=user_string, location=self.location)
+    
+    def __repr__(self):
+        if self.login != 'my':
+            user_string = '<{0}> '.format(self.login)
+        else:
+            user_string = ''
+        return '<{module}.{cls}: {name}at <{loc}>>'.format(module=self.__module__,
+            cls=self.__class__.__name__, name=user_string, loc=self.location)
+        
     @property
     def url(self):
         return '{base_url}/{login}/'.format(base_url=self.base_url, login=self.login)
