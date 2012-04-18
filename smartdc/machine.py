@@ -1,7 +1,22 @@
 import time
+from datetime import datetime
 
-priv = lambda(x): x.startswith((u'192.168.', u'10.', u'172.'))
-pub  = lambda(x): not priv(x)
+
+def priv(x): 
+    return x.startswith((u'192.168.', u'10.', u'172.'))
+
+
+def pub(x): 
+    return not priv(x)
+
+
+def dt_time(x): 
+    return datetime.strptime(x.rpartition('+')[0], "%Y-%m-%dT%H:%M:%S")
+
+
+def timestamp(x): 
+    return calendar.timegm(dt_time(x).timetuple())
+
 
 class Machine(object):
     def __init__(self, data=None, datacenter=None, machine_id=None):
@@ -31,8 +46,8 @@ class Machine(object):
         self.disk = data.get('disk')
         self.ips = data.get('ips', [])
         self.metadata = data.get('metadata', {})
-        self.created = data.get('created')
-        self.updated = data.get('updated')
+        self.created = dt_time(data.get('created'))
+        self.updated = dt_time(data.get('updated'))
     
     def refresh(self):
         data = self.datacenter.raw_machine_data(self.id)
@@ -169,8 +184,8 @@ class Snapshot(object):
     
     def _save(self, data):
         self.state = data.get('state')
-        self.created = data.get('created')
-        self.updated = data.get('updated')
+        self.created = dt_time(data.get('created'))
+        self.updated = dt_time(data.get('updated'))
     
     @property
     def path(self):
