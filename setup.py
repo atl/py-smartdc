@@ -5,7 +5,7 @@ with open('readme.rst') as file:
 
 setup(
     name='smartdc',
-    version='0.1.0',
+    version='0.1.1',
     description="Joyent SmartDataCenter CloudAPI connector using http-signature authentication via Requests",
     long_description=long_description,
     classifiers=[
@@ -24,9 +24,9 @@ setup(
     author='Adam T. Lindsay',
     author_email='a.lindsay+github@gmail.com',
     url='https://github.com/atl/py-smartdc',
-    license='LICENSE',
+    license='MIT',
     packages=find_packages(),
     include_package_data=True,
     zip_safe=True,
-    install_requires=['setuptools','requests','pycrypto'],
+    install_requires=['requests','pycrypto','http-signature'],
 )
