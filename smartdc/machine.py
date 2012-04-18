@@ -162,9 +162,10 @@ class Machine(object):
         j, _ = self.datacenter.request('POST', self.path + '/snapshots', params=params)
         return Snapshot(machine=self, data=j, name=name)
     
-    def start_snapshot(self, name):
+    def start_from_snapshot(self, name):
         _, r = self.datacenter.request('POST', self.path + '/snapshots/' + str(name))
         r.raise_for_status()
+        return self
     
 
 class Snapshot(object):
@@ -206,4 +207,5 @@ class Snapshot(object):
     def start(self):
         _, r = self.machine.datacenter.request('POST', self.path)
         r.raise_for_status()
+        return self.machine
     
