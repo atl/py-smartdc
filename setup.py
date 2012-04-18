@@ -1,10 +1,13 @@
 from setuptools import setup, find_packages
 
+with open('readme.rst') as file:
+    long_description = file.read()
+
 setup(
     name='smartdc',
-    version='0.1.0',
-    description="SmartDataCenter CloudAPI connector",
-    long_description="Joyent SmartDataCenter connection using http-signature authentication via kennethreitz's Requests",
+    version='0.1.2',
+    description="Joyent SmartDataCenter CloudAPI connector using http-signature authentication via kennethreitz's Requests",
+    long_description=long_description,
     classifiers=[
         "Programming Language :: Python",
         "Topic :: Software Development :: Libraries :: Python Modules",
@@ -15,15 +18,15 @@ setup(
         "Intended Audience :: Developers",
         "Intended Audience :: System Administrators",
         "License :: OSI Approved :: MIT License",
-        
+        "Development Status :: 3 - Alpha",
     ],
     keywords='http,web,joyent,admin,operations',
     author='Adam T. Lindsay',
     author_email='a.lindsay+github@gmail.com',
     url='https://github.com/atl/py-smartdc',
-    license='MIT',
+    license='LICENSE',
     packages=find_packages(),
     include_package_data=True,
-    zip_safe=False,
+    zip_safe=True,
     install_requires=['setuptools','requests','pycrypto'],
 )
