@@ -101,8 +101,9 @@ class DataCenter(object):
             user_string = '<{0}> '.format(self.login)
         else:
             user_string = ''
-        return '<{module}.{cls}: {name}at <{loc}>>'.format(module=self.__module__,
-            cls=self.__class__.__name__, name=user_string, loc=self.location)
+        return '<{module}.{cls}: {name}at <{loc}>>'.format(
+            module=self.__module__, cls=self.__class__.__name__, 
+            name=user_string, loc=self.location)
         
     @property
     def url(self):
@@ -365,7 +366,8 @@ class DataCenter(object):
                 query_limit = int(r.headers['x-query-limit'])
                 resource_count = int(r.headers['x-resource-count'])
                 if resource_count > query_limit:
-                    data['offset'] = params.get('offset', offset) + params.get('limit', limit)
+                    data['offset'] = (params.get('offset', offset) + 
+                                      params.get('limit', limit)    )
                 else:
                     break
             else:
