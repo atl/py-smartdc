@@ -40,7 +40,7 @@ class DataCenter(object):
         """
         A DataCenter object may be instantiated without any parameters, but
         practically speaking, the 'key_id' and 'secret' parameters are 
-        necessary before any real requests may be made. 
+        necessary before any meaningful requests may be made. 
         
         The 'location' parameter is notionally a hostname, but it may be 
         expressed as an FQDN, one of the keys to the 'known_locations' dict, 
