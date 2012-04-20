@@ -249,15 +249,25 @@ class DataCenter(object):
         j, _ = self.request('GET', 'datasets')
         return j
     
+    def default_dataset(self):
+        """
+        GET /:login/datasets
+        
+        Requests all the datasets in this datacenter, filters for the default, 
+        and returns a single dict.
+        """
+        return filter(itemgetter('default'), self.datasets())[0]
+    
     def dataset(self, dataset_id):
         """
         GET /:login/datasets/:id
         
-        Gets a single dataset identified by the unique ID. If passed a dict 
-        that contains an 'id' key, it uses the respective value as the ID.
+        Gets a single dataset identified by the unique ID or URN. URNs are 
+        also prefix-matched. If passed a dict that contains an 'urn' or 'id' 
+        key, it uses the respective value as the identifier.
         """
         if isinstance(dataset_id, dict):
-            dataset_id = dataset_id['id']
+            dataset_id = dataset_id.get('urn', dataset_id['id'])
         j, _ = self.request('GET', 'datasets/' + str(dataset_id))
         return j
     
@@ -338,7 +348,7 @@ class DataCenter(object):
             params['name'] = name
         if dataset:
             if isinstance(dataset, dict):
-                dataset = dataset['id']
+                dataset = dataset.get('urn', dataset['id'])
             params['dataset'] = dataset
         if state:
             params['state'] = state
@@ -391,8 +401,9 @@ class DataCenter(object):
         passed a dict containing a 'name' key, it uses the corresponding 
         value.
         
-        'dataset' is base OS image identified by a globally unique ID. If 
-        passed a dict containing an 'id' key, it uses the corresponding value.
+        'dataset' is base OS image identified by a globally unique ID or URN. 
+        If passed a dict containing an 'urn' or 'id' key, it uses the 
+        corresponding value.
         
         'metadata_dict' and 'tag_dict' are optionally passed dicts containing
         arbitrary key-value pairs. A guideline for determining between the two 
@@ -410,7 +421,7 @@ class DataCenter(object):
         if dataset:
             if isinstance(dataset, dict):
                 dataset = dataset['id']
-            params['dataset'] = dataset
+            params['dataset'] = dataset.get('urn', dataset['id'])
         if metadata_dict:
             for k, v in metadata_dict.items():
                 params['metadata.' + str(k)] = v
