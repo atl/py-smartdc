@@ -21,7 +21,8 @@ DEFAULT_LOCATION = 'us-west-1'
 DEFAULT_HEADERS = {
     'Accept':        'application/json',
     'Content-Type':  'application/json; charset=UTF-8',
-    'X-Api-Version': API_VERSION
+    'X-Api-Version':  API_VERSION,
+    'User-Agent':    'py-smartdc'
 }
 
 DEBUG_CONFIG = {'verbose': sys.stderr}
