@@ -282,6 +282,15 @@ class DataCenter(object):
         j, _ = self.request('GET', 'packages')
         return j
     
+    def default_package(self):
+        """
+        GET /:login/packages
+        
+        Requests all the packages in this datacenter, filters for the default, 
+        and returns a single dict.
+        """
+        return filter(itemgetter('default'), self.datasets())[0]
+    
     def package(self, name):
         """
         GET /:login/packages/:package
