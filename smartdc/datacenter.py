@@ -1,5 +1,6 @@
 import sys
 import json
+from operator import itemgetter
 
 import requests
 from http_signature.requests_auth import HTTPSignatureAuth
