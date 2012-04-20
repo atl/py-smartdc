@@ -41,11 +41,11 @@ class Machine(object):
     cases, instead requiring the user to explicitly update with a refresh() 
     call.
     """
-    def __init__(self, data=None, datacenter=None, machine_id=None):
+    def __init__(self, datacenter, machine_id=None, data=None):
         """
         Typically, a Machine object is instantiated automatically by a
         DataCenter object, but a user may instantiate one with a minimum
-        of a datacenter object and a unique ID according to the machine. 
+        of a 'datacenter' object and a unique ID according to the machine. 
         If data is passed in to instantiate, then the init method takes 
         in the dict and populates its internal values from that.
         """
@@ -390,6 +390,15 @@ class Machine(object):
         r.raise_for_status()
         return self
     
+    def snapshot(self, name):
+        """
+        GET /:login/machines/:id/snapshots/:name
+        
+        Return a Snapshot object that already exists for the machine, 
+        identified by 'name'.
+        """
+        return Snapshot(machine=self, name=name)
+    
 
 class Snapshot(object):
     """
@@ -398,7 +407,7 @@ class Snapshot(object):
     A Snapshot object is intended to be a convenient container for a 
     snapshot's state and for performing methods on it.
     """
-    def __init__(self, machine=None, data=None, name=None):
+    def __init__(self, machine, name=None, data=None):
         """
         Typically, a snapshot object is instantiated automatically by 
         creating or listing snapshots for a Machine. However, a snapshot may

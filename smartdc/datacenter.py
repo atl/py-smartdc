@@ -393,7 +393,7 @@ class DataCenter(object):
                     break
             else:
                 break
-        return [Machine(data=m, datacenter=self) for m in machines]
+        return [Machine(datacenter=self, data=m) for m in machines]
     
     def create_machine(self, name=None, package=None, dataset=None,
             metadata_dict=None, tag_dict=None):
@@ -440,6 +440,19 @@ class DataCenter(object):
             for k, v in tag_dict.items():
                 params['tag.' + str(k)] = v
         j, r = self.request('POST', 'machines', params=params)
-        return Machine(j, self)
+        return Machine(datacenter=self, data=j)
+    
+    def machine(self, machine_id):
+        """
+        GET /:login/machines/:id
+        
+        Return a Machine object already present in the datacenter, identified 
+        by 'machine_id', its unique ID.
+        """
+        if isinstance(machine_id, dict):
+            machine_id = machine_id['id']
+        elif isinstance(machine_id, Machine):
+            machine_id = machine_id.id
+        return Machine(datacenter=self, machine_id=machine_id)
     
 
