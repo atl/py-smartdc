@@ -53,7 +53,7 @@ Usage
     
     east = sdc.datacenter('us-east-1')
     
-    east.package('Small 1GB')
+    east.default_package()
     
     nu = east.create_image()
     
