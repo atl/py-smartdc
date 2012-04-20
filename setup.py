@@ -5,7 +5,7 @@ with open('readme.rst') as file:
 
 setup(
     name='smartdc',
-    version='0.1.1',
+    version='0.1.2',
     description="Joyent SmartDataCenter CloudAPI connector using http-signature authentication via Requests",
     long_description=long_description,
     classifiers=[
