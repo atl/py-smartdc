@@ -413,7 +413,8 @@ class DataCenter(object):
         
         'dataset' is base OS image identified by a globally unique ID or URN. 
         If passed a dict containing an 'urn' or 'id' key, it uses the 
-        corresponding value.
+        corresponding value. The server API appears to resolve incomplete or
+        ambiguous URNs with the highest version number.
         
         'metadata_dict' and 'tag_dict' are optionally passed dicts containing
         arbitrary key-value pairs. A guideline for determining between the two 
