@@ -75,6 +75,13 @@ class DataCenter(object):
         
         The `known_locations` dict allows for custom access to a private 
         cloud.
+        
+        Attributes:
+        
+        :var location: location of the machine
+        :var known_locations: :py:class:`dict` of known locations for this 
+            cluster of datacenters
+        :var login: user path in the SmartDC
         """
         self.location = location or DEFAULT_LOCATION
         self.known_locations = known_locations or KNOWN_LOCATIONS
@@ -123,6 +130,7 @@ class DataCenter(object):
         
     @property
     def url(self):
+        """Base URL for SmartDC requests"""
         return '{base_url}/{login}/'.format(base_url=self.base_url, 
             login=self.login)
     
