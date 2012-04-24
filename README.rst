@@ -37,6 +37,13 @@ Requirements
 .. _PyCrypto: http://pypi.python.org/pypi/pycrypto
 
 
+Installation
+------------
+
+::
+
+    pip install smartdc
+
 Usage
 -----
 
