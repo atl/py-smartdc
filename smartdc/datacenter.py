@@ -32,35 +32,49 @@ class DataCenter(object):
     """
     Basic connection object that makes all API requests.
     
-    The DataCenter is the basic connection unit with the CloudAPI, and it
-    maintains the data it requires for further requests. It lazily updates 
-    some internal data as and when the user requests it, and only
-    accesses the REST API on internal function calls.
+    The :py:class:`smartdc.datacenter.DataCenter` is the basic connection unit 
+    with the CloudAPI, and it maintains the data it requires for further 
+    requests. It lazily updates some internal data as and when the user 
+    requests it, and only accesses the REST API on method calls (never on 
+    attribute access).
     """
     def __init__(self, location=None, key_id=None, secret=None, 
                 headers=None, login=None, config=None, known_locations=None):
         """
-        A DataCenter object may be instantiated without any parameters, but
-        practically speaking, the 'key_id' and 'secret' parameters are 
-        necessary before any meaningful requests may be made. 
+        A :py:class:`smartdc.datacenter.DataCenter` object may be instantiated 
+        without any parameters, but practically speaking, the `key_id` and 
+        `secret` parameters are necessary before any meaningful requests may 
+        be made. 
         
-        The 'location' parameter is notionally a hostname, but it may be 
-        expressed as an FQDN, one of the keys to the 'known_locations' dict, 
+        :param location: SmartDC API's hostname
+        :type location: :py:class:`basestring`
+        
+        :param key_id: SmartDC identifier for the ssh key
+        :type key_id: :py:class:`basestring`
+        
+        :param secret: path to private rsa key
+        :type secret: :py:class:`str`
+        
+        :param headers: headers inserted upon every request
+        :type headers: :py:class:`dict`
+        
+        :param login: user path in SmartDC
+        :type login: :py:class:`basestring`
+        
+        :param config: Requests-style configuration
+        :type config: :py:class:`dict`
+        
+        :param known_locations: keys-to-URLs mapping used by `location` 
+        :type known_locations: :py:class:`dict`
+        
+        The `location` is notionally a hostname, but it may be 
+        expressed as an FQDN, one of the keys to the `known_locations` dict, 
         or, as a fallback, a bare hostname as prefix to the API_HOST_SUFFIX.
-        
         The default location is 'us-west-1', because that is where 
-        'api.joyentcloud.com' redirects to at the time of writing. 
+        'api.joyentcloud.com' redirects to at the time of writing.
         
-        Custom 'headers' that are inserted upon every request may be specified 
-        as a dict. 
-        
-        The 'login' parameter reflects the user's path. 
-        
-        The 'config' dict is as with Requests, and DEBUG_CONFIG, which echoes 
-        every request to stderr, is pre-defined as a convenience. 
-        
-        The 'known_locations' parameter may be given a keys-to-URLs mapping, 
-        allowing one to customize access to a private cloud.
+        The `known_locations` dict allows for custom access to a private 
+        cloud.
         """
         self.location = location or DEFAULT_LOCATION
         self.known_locations = known_locations or KNOWN_LOCATIONS
@@ -97,7 +111,7 @@ class DataCenter(object):
     
     def __repr__(self):
         """
-        Representation of a DataCenter as a string.
+        Representation of a DataCenter as a :py:class:`str`.
         """
         if self.login != 'my':
             user_string = '<{0}> '.format(self.login)
@@ -114,24 +128,34 @@ class DataCenter(object):
     
     def authenticate(self, key_id=None, secret=None):
         """
-        If no 'key_id' or 'secret' were entered on initialization, or there is
+        :param key_id: SmartDC identifier for the ssh key
+        :type key_id: :py:class:`basestring`
+        
+        :param secret: path to private rsa key
+        :type secret: :py:class:`basestring`
+        
+        If no `key_id` or `secret` were entered on initialization, or there is
         a need to change the existing authentication credentials, one may 
-        authenticate with a 'key_id' and 'secret'.
+        authenticate with a `key_id` and `secret`.
         """
         if key_id and secret:
             self.auth = HTTPSignatureAuth(key_id=key_id, secret=secret)
     
     def request(self, method, path, headers=None, **kwargs):
         """
-        Modify requests slightly passing via the Requests base 'request'
-        method.
+        (Primarily) internal method for making all requests to the datacenter.
         
-        Input is a path, rather then a full URL, and default headers and 
-        authentication are inserted.
+        :param method: HTTP verb
+        :type method: :py:class:`str`
         
-        Output is a tuple of the response body (decoded according to 
-        content-type) and the requests object itself. Client (4xx) errors are 
-        raised immediately.
+        :param path: path relative to `login` path
+        :type path: :py:class:`str`
+        
+        :param headers: additional headers to send
+        :type headers: :py:class:`dict`
+        
+        :Returns: tuple of decoded response body & `Response` object
+        :raises: client (4xx) errors
         """
         full_path = self.url + path
         request_headers = {}
@@ -152,10 +176,13 @@ class DataCenter(object):
     
     def api(self):
         """
-        GET /
+        ::
         
-        Returns a programmatically-generated API summary using HTTP verbs and 
-        URL templates.
+            GET /
+        
+        :Returns: a programmatically-generated API summary using HTTP verbs 
+            and URL templates
+        :rtype: :py:class:`dict`
         """
         resp = requests.request('GET', self.base_url)
         if 400 <= resp.status_code < 499:
@@ -165,30 +192,44 @@ class DataCenter(object):
     
     def keys(self):
         """
-        GET /:login/keys
+        ::
         
-        Returns a list of all public keys on record (each represented within a 
-        dict) for the authenticated account.
+            GET /:login/keys
+        
+        :Returns: all public keys on record for the authenticated account.
+        :rtype: :py:class:`list` of :py:class:`dict`\s
         """
         j, _ = self.request('GET', 'keys')
         return j
     
     def key(self, key_id):
         """
-        GET /:login/keys/:key
+        ::
         
-        Retrieves an individual key record (represented as key-values within a 
-        dict) based on the 'key_id'.
+            GET /:login/keys/:key
+        
+        :param key_id: identifier for an individual key record for the account
+        :type key_id: :py:class:`basestring`
+        
+        :returns: details of the key
+        :rtype: :py:class:`dict`
         """
         j, _ = self.request('GET', 'keys/' + str(key_id))
         return j
     
     def add_key(self, key_id, key):
         """
-        POST /:login/keys
+        ::
         
-        Uploads a new OpenSSH key to SmartDataCenter for use in SSH and HTTP 
-        signing, where 'key_id' is the name, and 'key' is the key in text.
+            POST /:login/keys
+        
+        :param key_id: label for the new key
+        :type key_id: :py:class:`basestring`
+        
+        :param key: the full SSH RSA public key
+        :type key: :py:class:`str`
+        
+        Uploads a public key to be added to the account's credentials.
         """
         data = json.dumps({'name': str(key_id), 'key': str(key)})
         j, _ = self.request('POST', 'keys', data=data)
@@ -196,9 +237,14 @@ class DataCenter(object):
     
     def delete_key(self, key_id):
         """
-        DELETE /:login/keys/:key
+        ::
         
-        Deletes an SSH key from the server by 'key_id'.
+            DELETE /:login/keys/:key
+        
+        :param key_id: identifier for an individual key record for the account
+        :type key_id: :py:class:`basestring`
+        
+        Deletes an SSH key from the server identified by `key_id`.
         """
         j, r = self.request('DELETE', 'keys/' + str(key_id))
         r.raise_for_status()
@@ -206,9 +252,12 @@ class DataCenter(object):
     
     def me(self):
         """
-        GET /:login
+        ::
         
-        Returns basic information about the authenticated account.
+            GET /:login
+        
+        :Returns: basic information about the authenticated account
+        :rtype: :py:class:`dict`
         """
         j, _ = self.request('GET', '')
         if 'login' in j and self.login == 'my':
@@ -217,11 +266,16 @@ class DataCenter(object):
     
     def datacenters(self):
         """
-        GET /:login/datacenters
+        ::
         
-        Returns a dict of all datacenters (mapping from short location key to 
-        full URL) that this cloud is aware of. Updates the local 
-        'known_locations' based upon this information.
+            GET /:login/datacenters
+        
+        :Returns: all datacenters (mapping from short location key to 
+            full URL) that this cloud is aware of
+        :rtype: :py:class:`dict`
+        
+        This method also updates the local `known_locations` attribute based 
+        upon this information.
         """
         j, _ = self.request('GET', 'datacenters')
         self.known_locations.update(j)
@@ -229,9 +283,14 @@ class DataCenter(object):
     
     def datacenter(self, name):
         """
-        Returns a new DataCenter object, treating the 'name' argument as a 
-        location key, and keeping existing authentication and other 
-        configurations on this object.
+        :param name: location key
+        :type name: :py:class:`basestring`
+        
+        :Returns: a new DataCenter object
+        
+        This method treats the 'name' argument as a location key (on the 
+        `known_locations` attribute dict) or FQDN, and keeps existing 
+        authentication and other configuration from this object.
         """
         # The base form of this, as below, simply sets up a redirect. 
         # j, _ = self.request('GET', 'datacenters/' + str(name))
@@ -242,29 +301,44 @@ class DataCenter(object):
     
     def datasets(self):
         """
-        GET /:login/datasets
+        ::
         
-        Provides a list of datasets (OS templates) available in this 
-        datacenter, represented as a dict.
+            GET /:login/datasets
+        
+        :Returns: datasets (operating system templates) available in this 
+            datacenter 
+        :rtype: :py:class:`list` of :py:class:`dict`\s
         """
         j, _ = self.request('GET', 'datasets')
         return j
     
     def default_dataset(self):
         """
-        GET /:login/datasets
+        ::
+        
+            GET /:login/datasets
+        
+        :Returns: the default dataset for this datacenter
+        :rtype: :py:class:`dict`
         
         Requests all the datasets in this datacenter, filters for the default, 
-        and returns a single dict.
+        and returns the corresponding :py:class:`dict`.
         """
         return filter(itemgetter('default'), self.datasets())[0]
     
     def dataset(self, dataset_id):
         """
-        GET /:login/datasets/:id
+        ::
+        
+            GET /:login/datasets/:id
+        
+        :param dataset_id: unique ID or URN for a dataset
+        :type dataset_id: :py:class:`basestring` or :py:class:`dict`
+        
+        :rtype: :py:class:`dict`
         
         Gets a single dataset identified by the unique ID or URN. URNs are 
-        also prefix-matched. If passed a dict that contains an 'urn' or 'id' 
+        also prefix-matched. If passed a dict that contains an `urn` or `id` 
         key, it uses the respective value as the identifier.
         """
         if isinstance(dataset_id, dict):
@@ -274,29 +348,44 @@ class DataCenter(object):
     
     def packages(self):
         """
-        GET /:login/packages
+        ::
         
-        Returns a list of packages (machine "sizes", as a dict of resource 
-        types and values) available in this datacenter.
+            GET /:login/packages
+        
+        :Returns: packages (machine "sizes", with resource types and values) 
+            available in this datacenter.
+        :rtype: :py:class:`list` of :py:class:`dict`\s
         """
         j, _ = self.request('GET', 'packages')
         return j
     
     def default_package(self):
         """
-        GET /:login/packages
+        ::
+        
+            GET /:login/packages
+        
+        :Returns: the default package for this datacenter
+        :rtype: :py:class:`dict`
         
         Requests all the packages in this datacenter, filters for the default, 
-        and returns a single dict.
+        and returns the corresponding dict.
         """
         return filter(itemgetter('default'), self.datasets())[0]
     
     def package(self, name):
         """
-        GET /:login/packages/:package
+        ::
+        
+            GET /:login/packages/:package
+        
+        :param name: the name identifying the package
+        :type dataset_id: :py:class:`basestring` or :py:class:`dict`
+        
+        :rtype: :py:class:`dict`
         
         Gets a dict representing resource values for a package by name. If 
-        passed a dict containing a 'name' key, it uses the corresponding 
+        passed a dict containing a `name` key, it uses the corresponding 
         value.
         """
         if isinstance(name, dict):
@@ -306,10 +395,13 @@ class DataCenter(object):
     
     def num_machines(self):
         """
-        HEAD /:login/machines
+        ::
         
-        Returns a count of the number of machines present at this datacenter
-        via a HEAD request.
+            HEAD /:login/machines
+        
+        :Returns: a count of the number of machines owned by the user at this
+            datacenter
+        :rtype: :py:class:`int`
         """
         _, r = self.request('HEAD', 'machines')
         num = r.headers.get('x-resource-count', 0)
@@ -317,9 +409,15 @@ class DataCenter(object):
     
     def raw_machine_data(self, machine_id):
         """
-        GET /:login/machines/:machine
+        ::
         
-        Primarily used internally to get a raw dict of a single machine.
+            GET /:login/machines/:machine
+        
+        :param machine_id: identifier for the machine instance
+        :type machine_id: :py:class:`basestring` or :py:class:`dict`
+        :rtype: :py:class:`dict`
+        
+        Primarily used internally to get a raw dict for a single machine.
         """
         if isinstance(machine_id, dict):
             machine_id = machine_id['id']
@@ -330,26 +428,54 @@ class DataCenter(object):
             memory=None, tombstone=None, tag_dict=None, credentials=False, 
             paged=False, limit=None, offset=None):
         """
-        GET /:login/machines
+        ::
+        
+            GET /:login/machines
         
         Query for machines in the current DataCenter matching the input 
-        criteria, returning a list of instantiated Machine() objects. 
+        criteria, returning a :py:class:`list` of instantiated 
+        :py:class:`smartdc.machine.Machine` objects.
         
-        Basic filter criteria include 'machine_type', 'name', 'dataset', 
-        'state', and 'memory'. 
+        :param machine_type: virtualmachine or smartmachine
+        :type machine_type: :py:class:`basestring`
         
-        'tombstone' allows you to query for machines destroyed in the last N 
-        minutes. 
+        :param name: machine name to find (will make the return list size 
+            1 or 0)
+        :type name: :py:class:`basestring`
         
-        'tag_dict' accepts a dict of keys and values to query upon in the 
-        machine's tag space. 
+        :param dataset: unique ID or URN for a dataset
+        :type dataset: :py:class:`basestring` or :py:class:`dict`
         
-        'credentials' is a flag that signals whether to return the created 
-        credentials in the query.
+        :param state: current running state
+        :type state: :py:class:`basestring`
         
-        'limit' and 'offset' are the REST API's raw paging mechanism. 
-        Alternatively, one can let 'paged' remain False, and let the method 
-        call attempt to collect all of the machines.
+        :param memory: current size of the RAM deployed for the machine (Mb)
+        :type memory: :py:class:`int`
+        
+        :param tombstone: include machines destroyed in the last N minutes
+        :type tombstone: :py:class:`int`
+        
+        :param tag_dict: keys and values to query in the machines' tag space
+        :type tag_dict: :py:class:`dict`
+        
+        :param credentials: whether to include the generated credentials for 
+            machines, if present
+        :type credentials: :py:class:`bool`
+        
+        :param paged: whether to return in pages
+        :type paged: :py:class:`bool`
+        
+        :param limit: return N machines
+        :type limit: :py:class:`int`
+        
+        :param offset: get the next `limit` of machines starting at this point
+        :type offset: :py:class:`int`
+        
+        :rtype: :py:class:`list` of :py:class:`smartdc.machine.Machine`\s
+        
+        The `limit` and `offset` are the REST API's raw paging mechanism. 
+        Alternatively, one can let `paged` remain `False`, and let the method 
+        call attempt to collect all of the machines in multiple calls.
         """
         params = {}
         if machine_type:
@@ -398,29 +524,41 @@ class DataCenter(object):
     def create_machine(self, name=None, package=None, dataset=None,
             metadata_dict=None, tag_dict=None):
         """
-        POST /:login/machines
+        ::
         
-        Provision a machine in the current DataCenter, returning an 
-        instantiated Machine() object. All of the parameter values are 
-        optional, as they are assigned default values by the Datacenter's API 
-        itself.
+            POST /:login/machines
         
-        'name' is a string used as a humab-readable label for the machine.
+        Provision a machine in the current 
+        :py:class:`smartdc.datacenter.DataCenter`, returning an instantiated 
+        :py:class:`smartdc.machine.Machine` object. All of the parameter 
+        values are optional, as they are assigned default values by the 
+        datacenter's API itself.
         
-        'package' is a cluster of resource values identified by name. If 
-        passed a dict containing a 'name' key, it uses the corresponding 
-        value.
+        :param name: a human-readable label for the machine
+        :type name: :py:class:`basestring`
         
-        'dataset' is base OS image identified by a globally unique ID or URN. 
-        If passed a dict containing an 'urn' or 'id' key, it uses the 
-        corresponding value. The server API appears to resolve incomplete or
-        ambiguous URNs with the highest version number.
+        :param package: cluster of resource values identified by name
+        :type package: :py:class:`basestring` or :py:class:`dict`
         
-        'metadata_dict' and 'tag_dict' are optionally passed dicts containing
-        arbitrary key-value pairs. A guideline for determining between the two 
-        is that tags may be used as filters when querying for and listing 
-        machines, while a metadata dict is returned when requesting details of 
-        a machine.
+        :param dataset: base operating system image identified by a globally 
+            unique ID or URN
+        :type dataset: :py:class:`basestring` or :py:class:`dict`
+        
+        :param metadata_dict: keys & values with arbitrary supplementary 
+            details for the machine
+        :type metadata_dict: :py:class:`dict`
+        
+        :param tag_dict: keys & values with arbitrary supplementary 
+            identifying information for filtering when querying for machines
+        :type tag_dict: :py:class:`dict`
+        
+        :rtype: :py:class:`smartdc.machine.Machine`
+        
+        If `package` or `dataset` are passed a :py:class:`dict` containing a 
+        `name` key (in the case of `package`) or a `urn` or `id` key (in the 
+        case of `dataset`), it passes the corresponding value. The server API 
+        appears to resolve incomplete or ambiguous dataset URNs with the 
+        highest version number.
         """
         params = {}
         if name:
@@ -444,10 +582,15 @@ class DataCenter(object):
     
     def machine(self, machine_id):
         """
-        GET /:login/machines/:id
+        ::
         
-        Return a Machine object already present in the datacenter, identified 
-        by 'machine_id', its unique ID.
+            GET /:login/machines/:id
+        
+        :param machine_id: unique identifier for a machine to be found in the 
+            datacenter
+        :type machine_id: :py:class:`basestring`
+        
+        :rtype: :py:class:`smartdc.machine.Machine`
         """
         if isinstance(machine_id, dict):
             machine_id = machine_id['id']

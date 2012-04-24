@@ -10,7 +10,8 @@ API Documentation
 .. toctree::
    :maxdepth: 4
    
-   smartdc
+   datacenter
+   machine
 
 
 Indices and tables
