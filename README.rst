@@ -36,6 +36,16 @@ Requirements
 .. _requests: https://github.com/kennethreitz/requests
 .. _PyCrypto: http://pypi.python.org/pypi/pycrypto
 
+Python SmartDataCenter Links
+----------------------------
+
+* PyPI_
+* GitHub_
+* Documentation_
+
+.. _PyPI: http://pypi.python.org/pypi/smartdc
+.. _GitHub: https://github.com/atl/py-smartdc
+.. _Documentation: http://packages.python.org/smartdc/
 
 Installation
 ------------

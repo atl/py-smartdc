@@ -1,3 +1,5 @@
 pycrypto
 http-signature
 requests
+Sphinx
+Sphinx-PyPI-upload
