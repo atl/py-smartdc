@@ -39,11 +39,11 @@ Requirements
 Python SmartDataCenter Links
 ----------------------------
 
-* PyPI_
-* GitHub_
+* `smartdc in PyPI`_
+* GitHub_ (atl/py-smartdc)
 * Documentation_
 
-.. _PyPI: http://pypi.python.org/pypi/smartdc
+.. _smartdc on PyPI: http://pypi.python.org/pypi/smartdc
 .. _GitHub: https://github.com/atl/py-smartdc
 .. _Documentation: http://packages.python.org/smartdc/
 
