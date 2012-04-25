@@ -28,14 +28,6 @@ Requirements
 * (We assume that ``json`` is present because requests now requires py2.6 and 
   up.)
 
-.. _Joyent: http://joyentcloud.com/
-.. _CloudAPI: https://us-west-1.api.joyentcloud.com/docs
-.. _http-signature: 
-    https://github.com/joyent/node-http-signature/blob/master/http_signing.md
-.. _py-http-signature: https://github.com/atl/py-http-signature
-.. _requests: https://github.com/kennethreitz/requests
-.. _PyCrypto: http://pypi.python.org/pypi/pycrypto
-
 Python SmartDataCenter Links
 ----------------------------
 
@@ -43,6 +35,13 @@ Python SmartDataCenter Links
 * GitHub_ (atl/py-smartdc)
 * Documentation_
 
+.. _Joyent: http://joyentcloud.com/
+.. _CloudAPI: https://us-west-1.api.joyentcloud.com/docs
+.. _http-signature: 
+    https://github.com/joyent/node-http-signature/blob/master/http_signing.md
+.. _py-http-signature: https://github.com/atl/py-http-signature
+.. _requests: https://github.com/kennethreitz/requests
+.. _PyCrypto: http://pypi.python.org/pypi/pycrypto
 .. _smartdc in PyPI: http://pypi.python.org/pypi/smartdc
 .. _GitHub: https://github.com/atl/py-smartdc
 .. _Documentation: http://packages.python.org/smartdc/
