@@ -33,10 +33,12 @@ Python SmartDataCenter Links
 
 * `smartdc in PyPI`_
 * GitHub_ (atl/py-smartdc)
-* Documentation_
+* `Python Documentation`_ & API reference
+* `Joyent CloudAPI Documentation`_
 
 .. _Joyent: http://joyentcloud.com/
-.. _CloudAPI: https://us-west-1.api.joyentcloud.com/docs
+.. _CloudAPI: https://api.joyentcloud.com/docs
+.. _Joyent CloudAPI Documentation: CloudAPI_
 .. _http-signature: 
     https://github.com/joyent/node-http-signature/blob/master/http_signing.md
 .. _py-http-signature: https://github.com/atl/py-http-signature
@@ -44,7 +46,7 @@ Python SmartDataCenter Links
 .. _PyCrypto: http://pypi.python.org/pypi/pycrypto
 .. _smartdc in PyPI: http://pypi.python.org/pypi/smartdc
 .. _GitHub: https://github.com/atl/py-smartdc
-.. _Documentation: http://packages.python.org/smartdc/
+.. _Python Documentation: http://packages.python.org/smartdc/
 
 Installation
 ------------
