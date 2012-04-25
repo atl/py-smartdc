@@ -43,7 +43,7 @@ Python SmartDataCenter Links
 * GitHub_ (atl/py-smartdc)
 * Documentation_
 
-.. _smartdc on PyPI: http://pypi.python.org/pypi/smartdc
+.. _smartdc in PyPI: http://pypi.python.org/pypi/smartdc
 .. _GitHub: https://github.com/atl/py-smartdc
 .. _Documentation: http://packages.python.org/smartdc/
 
