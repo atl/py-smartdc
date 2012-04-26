@@ -7,6 +7,9 @@ from http_signature.requests_auth import HTTPSignatureAuth
 
 from .machine import Machine
 
+__all__ = ['DataCenter', 'DEBUG_CONFIG', 'KNOWN_LOCATIONS', 
+            'DEFAULT_LOCATION']
+
 API_HOST_SUFFIX = '.api.joyentcloud.com'
 API_VERSION = '~6.5'
 
@@ -38,7 +41,7 @@ class DataCenter(object):
     requests it, and only accesses the REST API on method calls (never on 
     attribute access).
     """
-    def __init__(self, location=None, key_id=None, secret=None, 
+    def __init__(self, location=None, key_id=None, secret='~/.ssh/id_rsa', 
                 headers=None, login=None, config=None, known_locations=None):
         """
         A :py:class:`smartdc.datacenter.DataCenter` object may be instantiated 
@@ -52,7 +55,7 @@ class DataCenter(object):
         :param key_id: SmartDC identifier for the ssh key
         :type key_id: :py:class:`basestring`
         
-        :param secret: path to private rsa key
+        :param secret: path to private rsa key (default: '~/.ssh/id_rsa')
         :type secret: :py:class:`str`
         
         :param headers: headers inserted upon every request

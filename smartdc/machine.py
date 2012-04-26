@@ -1,6 +1,7 @@
 import time
 from datetime import datetime
 
+__all__ = ['Machine', 'Snapshot']
 
 def priv(x): 
     """
