@@ -59,17 +59,18 @@ Usage
 -----
 
 This is an example session as mini-tutorial. Import the library and initialize 
-the DataCenter, which is effectively a persistent connection object::
+the DataCenter, which is effectively our persistent connection object::
 
-    from smartdc import DataCenter
+    from smartdc import DataCenter, DEBUG_CONFIG
     
     sdc = DataCenter(location='us-sw-1', key_id='/test/keys/test_key', 
-                      secret='~/.ssh/id_rsa')
+                      secret='~/.ssh/id_rsa', config=DEBUG_CONFIG)
 
 The ``key_id`` is the only non-guessable component. It has the form 
 ``/<username>/keys/<key_name>`` with the labels derived from your Smart Data 
 Center (my.joyentcloud.com) account. By default, ``py-smartdc`` looks for your
-private ssh key at the above-listed path.
+private ssh key at the above-listed path. The ``DEBUG_CONFIG`` echoes each 
+CloudAPI connection to ``stderr`` to aid in debugging. 
 
 Once connected to a datacenter, you can look at all sorts of account 
 information, such as listing your uploaded public SSH keys::
