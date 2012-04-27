@@ -157,7 +157,7 @@ To learn more, you can read the API documentation for both the `DataCenter`_ and
 
 .. _ssh: https://github.com/bitprophet/ssh
 .. _DataCenter: http://packages.python.org/smartdc/datacenter.html
-.. _Machine: http://packages.python.org/smartdc/datacenter.html
+.. _Machine: http://packages.python.org/smartdc/machine.html
 
 Why?
 ----
