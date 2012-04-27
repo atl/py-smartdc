@@ -25,8 +25,10 @@ Requirements
 * requests_
 * py-http-signature_
 * PyCrypto_ (required by py-http-signature)
-* (We assume that ``json`` is present because requests now requires py2.6 and 
-  up.)
+
+We assume that ``json`` is present because requests now requires py2.6 and 
+up. Although the tutorial uses the ``ssh`` package, there is no dependency by
+``py-smartdc`` on it.
 
 Python SmartDataCenter Links
 ----------------------------
@@ -70,11 +72,13 @@ the DataCenter, which is effectively our persistent connection object::
     sdc = DataCenter(location='us-sw-1', key_id='/test/keys/test_key', 
                       secret='~/.ssh/id_rsa', config=DEBUG_CONFIG)
 
-The ``key_id`` is the only non-guessable component. It has the form 
-``/<username>/keys/<key_name>`` with the labels derived from your Smart Data 
-Center (my.joyentcloud.com) account. By default, ``py-smartdc`` looks for your
-private ssh key at the above-listed path. The ``DEBUG_CONFIG`` echoes each 
-CloudAPI connection to ``stderr`` to aid in debugging. 
+The ``key_id`` is the only parameter that requires user input. It has the form 
+``/<username>/keys/<key_name>`` with the ``key_name`` being the label attached 
+to the Public SSH key uploaded to your Smart Data Center (my.joyentcloud.com) 
+account (and corresponding to the private key identified in the ``secret`` 
+parameter). By default, ``py-smartdc`` looks for your private ssh key at the 
+above-listed path. The ``DEBUG_CONFIG`` echoes each CloudAPI connection to 
+``stderr`` to aid in debugging. 
 
 Once connected to a datacenter, you can look at all sorts of account 
 information, such as listing your uploaded public SSH keys::
@@ -92,43 +96,54 @@ return the default assigned by the datacenter::
 
     east.default_package()
 
-Packages, datasets and most other CloudAPI responses are returned as dicts or 
-lists of dicts. You can extract the unique identifiers from these 
-representations, or pass the dicts themselves to methods that refer to these 
-entities.
+Packages, datasets and most other CloudAPI entities are returned as dicts or 
+lists of dicts. You can extract the unique identifiers pointing to these 
+entities from these representations or pass the dicts themselves to methods 
+that refer to these entities. The name, id, or urn -- as appropriate -- is 
+extracted and passed to the CloudAPI.
 
 Datasets, as it turns out, don't require a fully qualified URN: the CloudAPI 
 currently appears to be clever enough to resolve an ambiguous URN to the most 
-recent one.
+recent one. Handy.
 
 ::
 
     latest64 = east.dataset('sdc:sdc:smartos64:')
 
 We can create a smartmachine with no arguments at all: a unique name, the 
-default dataset and package are automatically defined. However, it helps to 
-exercise a little control::
+default dataset, and the default package are automatically defined by the 
+datacenter. However, this python package is also about exercising fine 
+control::
 
     test_machine = east.create_machine(name='test-machine', dataset=latest64)
 
-There are convenience methods that block while continually polling the 
-datacenter for the machine's ``.state`` to be updated. Note that if you model 
-the state transition wrongly (or don't trigger a state change correctly), 
-these methods can block in an infinite loop.
+This instantiates a ``smartdc.Machine`` object that has its own methods and
+properties that allow you to examine data about the remote machine controlled 
+via CloudAPI. Many methods correspond with the HTTP API driving it, but there 
+are also convenience methods here, as well.
+
+For example, ``poll_while`` and ``poll_until`` that block while continually 
+polling the datacenter for the machine's ``.state`` to be updated. Note that 
+if you model the state transition wrongly (or don't trigger a state change 
+correctly), these methods can block in an infinite loop. We can also change 
+the wait interval (default of 2 seconds) if we're feeling particularly 
+impatient or conscientious.
 
 ::
 
-    test_machine.poll_while('provisioning')
+    test_machine.poll_while('provisioning', interval=1)
 
 Now that we have both provisioned a machine and ensured that it is running, we 
-can connect to it and list the installed packages. In order to do this, we use 
-`ssh`_, a fork of ``paramiko`` and a dependency of ``fab``. After a 
+can connect to it and list the installed packages. In order to do this, (for 
+the purposes of this tutorial, only) we use the `ssh`_ package, which is a 
+fork of ``paramiko`` and a dependency of ``fab``. After a 
 
     pip install ssh 
 
-...at the command line, we can continue with making a connection. We use our 
-default auto-located key that we have proven to be updated at the Smart Data 
-Center, and connect to the ``admin`` account::
+...at the command line, we can continue with making a connection. We can find 
+a user-accessible IP address using the ``public_ips`` property of our machine 
+instance. We use the key that we know works with the Smart Data Center, and 
+connect using the ``admin`` account::
 
     import ssh
     
@@ -138,11 +153,10 @@ Center, and connect to the ``admin`` account::
     
     ssh_conn.connect(test_machine.public_ips[0], username='admin')
 
-Many users would probably continue using ``fab``, but for this example, we 
-want to take the minimal approach. We can list the installed packages, and 
-trivially parse them into id-description pairs::
+We can list the installed packages, and trivially parse them into 
+id-description pairs::
 
-    _,rout,_ = ssh_conn.exec_command('pkgin ls')
+    _, rout, _ = ssh_conn.exec_command('pkgin ls')
     
     dict(ln.split(None,1) for ln in rout)
 
@@ -157,7 +171,8 @@ machine::
     
     test_machine.delete()
 
-To learn more, you can read the API documentation for both the `DataCenter`_ and `Machine`_ objects.
+To learn more, you can read the API documentation for both the `DataCenter`_ 
+and `Machine`_ objects.
 
 .. _ssh: https://github.com/bitprophet/ssh
 .. _DataCenter: http://packages.python.org/smartdc/datacenter.html
