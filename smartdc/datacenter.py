@@ -88,12 +88,6 @@ class DataCenter(object):
         """
         self.location = location or DEFAULT_LOCATION
         self.known_locations = known_locations or KNOWN_LOCATIONS
-        if self.location in self.known_locations:
-            self.base_url = self.known_locations[self.location]
-        elif '.' in self.location or self.location == 'localhost':
-            self.base_url = 'https://' + self.location
-        else:
-            self.base_url = 'https://' + self.location + API_HOST_SUFFIX
         self.config = config or {}
         if key_id and secret:
             self.auth = HTTPSignatureAuth(key_id=key_id, secret=secret)
@@ -130,12 +124,38 @@ class DataCenter(object):
         return '<{module}.{cls}: {name}at <{loc}>>'.format(
             module=self.__module__, cls=self.__class__.__name__, 
             name=user_string, loc=self.location)
-        
+    
+    def __eq__(self, other):
+        """
+        Not all DataCenters are created equal.
+        """
+        if isinstance(other, DataCenter):
+            if self.login == 'my':
+                self.me()
+            if other.login == 'my':
+                other.me()
+            return self.url == other.url
+        else:
+            return False
+    
+    def __ne__(self, other):
+        return not self.__eq__(other)
+    
     @property
     def url(self):
         """Base URL for SmartDC requests"""
         return '{base_url}/{login}/'.format(base_url=self.base_url, 
             login=self.login)
+    
+    @property
+    def base_url(self):
+        """Protocol + hostname"""
+        if self.location in self.known_locations:
+            return self.known_locations[self.location]
+        elif '.' in self.location or self.location == 'localhost':
+            return 'https://' + self.location
+        else:
+            return 'https://' + self.location + API_HOST_SUFFIX
     
     def authenticate(self, key_id=None, secret=None):
         """
