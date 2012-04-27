@@ -176,6 +176,8 @@ class DataCenter(object):
         resp = requests.request(method, full_path, auth=self.auth, 
             headers=request_headers, config=self.config, **kwargs)
         if 400 <= resp.status_code < 499:
+            if resp.content:
+                print >> sys.stderr, resp.content
             resp.raise_for_status()
         if resp.content:
             if resp.headers['content-type'] == 'application/json':
@@ -335,7 +337,11 @@ class DataCenter(object):
         Requests all the datasets in this datacenter, filters for the default, 
         and returns the corresponding :py:class:`dict`.
         """
-        return filter(itemgetter('default'), self.datasets())[0]
+        sets = filter(itemgetter('default'), self.datasets())
+        if sets:
+            return sets[0]
+        else:
+            return None
     
     def dataset(self, dataset_id):
         """
@@ -382,7 +388,11 @@ class DataCenter(object):
         Requests all the packages in this datacenter, filters for the default, 
         and returns the corresponding dict.
         """
-        return filter(itemgetter('default'), self.datasets())[0]
+        packages = filter(itemgetter('default'), self.packages())
+        if packages:
+            return packages[0]
+        else:
+            return None
     
     def package(self, name):
         """
