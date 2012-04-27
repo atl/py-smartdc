@@ -58,33 +58,86 @@ Installation
 Usage
 -----
 
-::
+This is an example session::
 
     from smartdc import DataCenter
     
     sdc = DataCenter(location='us-sw-1', key_id='/test/keys/test_key', 
                       secret='~/.ssh/id_rsa')
-    
+
+The `key_id` is the only non-guessable component. It has the form 
+``/<username>/keys/<key_name>`` with the labels derived from your Smart Data 
+Center (my.joyentcloud.com) account. By default, `py-smartdc` looks for your
+private ssh key at the above-listed path.
+
+Once connected to a datacenter, you can look at all sorts of account 
+information, such as listing your uploaded public SSH keys::
+
     sdc.keys()
     
-    sdc.datasets()
-    
+Given one datacenter, you can connect to another with your existing 
+credentials and preferences::
+
     east = sdc.datacenter('us-east-1')
     
-    east.default_package()
-    
-    nu = east.create_image()
-    
-    nu.poll_while('provisioning')
-    
-    nu.state
-    
-    nu.stop()
-    
-    nu.poll_until('stopped')
-    
-    nu.delete()
+`py-smartdc` defines a few convenience functions beyond the ones connecting to 
+the CloudAPI, such as filtering through all the packages or datasets to return 
+the default assigned by the datacenter::
 
+    east.default_package()
+
+Packages, datasets and most other CloudAPI responses are returned as dicts or 
+lists of dicts. You can extract the unique identifiers from these 
+representations, or pass the dicts themselves to methods that refer to these 
+entities.
+
+Datasets, as it turns out, don't require a fully qualified URN: the CloudAPI 
+currently appears to be clever enough to resolve an ambiguous URN to the most 
+recent one.
+
+::
+
+    latest64 = east.dataset('sdc:sdc:smartos64:')
+
+We can create a smartmachine with no arguments at all: a unique name, the default dataset and package are automatically defined. However, it helps to exercise a little control::
+
+    test_machine = east.create_machine(name='test-machine', dataset=latest64)
+
+There are convenience methods that block while continually polling the datacenter for the machine's `.state` to be updated. Note that if you model the state transition wrongly (or don't trigger a state change correctly), these methods can block in an infinite loop.
+
+    test_machine.poll_while('provisioning')
+
+Now that we have both provisioned a machine and ensured that it is running, we 
+can connect to it and list the installed packages. In order to do this, we use 
+`ssh`_, a fork of `paramiko` and a dependency of `fab`. After a 
+``pip install ssh`` at the command line, we can continue with making a 
+connection. We use our default auto-located key that we have proven to be updated at the Smart Data Center, and connect to the `admin` account::
+
+    import ssh
+    
+    ssh_conn = ssh.SSHClient()
+    
+    ssh_conn.set_missing_host_key_policy(ssh.AutoAddPolicy())
+    
+    ssh_conn.connect(test_machine.public_ips[0], username='admin')
+
+Many users would probably continue using `fab`, but for this example, we want to take the minimal approach. We can list the installed packages, and trivially parse them into id-description pairs::
+
+    _,rout,_ = ssh_conn.exec_command('pkgin ls')
+    
+    dict(ln.split(None,1) for ln in rout)
+
+Close the connection, stop the machine, wait until stopped, and delete the machine::
+
+    ssh_conn.close()
+    
+    test_machine.stop()
+    
+    test_machine.poll_until('stopped')
+    
+    test_machine.delete()
+
+.. _ssh: https://github.com/bitprophet/ssh
 
 Why?
 ----
