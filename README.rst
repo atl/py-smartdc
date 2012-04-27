@@ -153,7 +153,11 @@ machine::
     
     test_machine.delete()
 
+To learn more, you can read the API documentation for both the `DataCenter`_ and `Machine`_ objects.
+
 .. _ssh: https://github.com/bitprophet/ssh
+.. _DataCenter: http://packages.python.org/smartdc/datacenter.html
+.. _Machine: http://packages.python.org/smartdc/datacenter.html
 
 Why?
 ----
