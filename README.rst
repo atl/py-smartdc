@@ -110,28 +110,38 @@ recent one. Handy.
 
     latest64 = east.dataset('sdc:sdc:smartos64:')
 
-We can create a smartmachine with no arguments at all: a unique name, the 
-default dataset, and the default package are automatically defined by the 
-datacenter. However, this python package is also about exercising fine 
-control::
+Sometimes we can create a smartmachine with no arguments at all: a default 
+dataset and a default package are usually defined by the datacenter, and a 
+unique name will also be defined if you omit one. However, this python package 
+is also about exercising fine control::
 
-    test_machine = east.create_machine(name='test-machine', dataset=latest64)
+    test_machine = east.create_machine(name='test-machine', dataset=latest64
+                    package='Small 1GB')
 
 This instantiates a ``smartdc.Machine`` object that has its own methods and
 properties that allow you to examine data about the remote machine controlled 
 via CloudAPI. Many methods correspond with the HTTP API driving it, but there 
 are also convenience methods here, as well.
 
-For example, ``poll_while`` and ``poll_until`` that block while continually 
-polling the datacenter for the machine's ``.state`` to be updated. Note that 
-if you model the state transition wrongly (or don't trigger a state change 
+For example, ``poll_while`` and ``poll_until`` block while continually polling 
+the datacenter for the machine's ``.state`` to be updated. Note that if you 
+model the state transition wrongly (or don't trigger a state change 
 correctly), these methods can block in an infinite loop. We can also change 
-the wait interval (default of 2 seconds) if we're feeling particularly 
+the wait interval (from a default of 2 seconds) if we're feeling particularly 
 impatient or conscientious.
 
 ::
 
     test_machine.poll_while('provisioning', interval=1)
+
+This Machine object is the same as what would be instantiated when listing 
+machines from the datacenter. When obtaining lists of machine resources from
+the Smart Data Center, the DataCenter object method returns instantiated 
+Machine objects that are the same as those that are freshly created. You can 
+quickly demonstrate this to yourself by searching for the new machine amongst
+the datacenter's machines::
+
+    test_machine == east.machines(name='test-machine')[0]
 
 Now that we have both provisioned a machine and ensured that it is running, we 
 can connect to it and list the installed packages. In order to do this, (for 
@@ -170,6 +180,26 @@ machine::
     test_machine.poll_until('stopped')
     
     test_machine.delete()
+
+If you have accumulated many test instances in a datacenter and you need to 
+shut them all down quickly, you might consider the following use of a thread 
+pool::
+
+    from operator import methodcaller
+    from multiprocessing.dummy import Pool
+    
+    simultaneous = Pool(east.num_machines())
+    all_machines = east.machines()
+    
+    simultaneous.map(methodcaller('stop'), all_machines)
+    
+    simultaneous.map(methodcaller('poll_until','stopped'), all_machines)
+    
+    simultaneous.map(methodcaller('status'), all_machines)
+    
+    simultaneous.map(methodcaller('delete'), all_machines)
+    
+    east.num_machines() == 0
 
 To learn more, you can read the API documentation for both the `DataCenter`_ 
 and `Machine`_ objects.
