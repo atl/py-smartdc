@@ -32,8 +32,10 @@ Python SmartDataCenter Links
 ----------------------------
 
 * `smartdc in PyPI`_
-* GitHub_ (atl/py-smartdc)
-* `Python Documentation`_ & API reference
+* `http_signature in PyPI`_
+* `py-smartdc at GitHub`_
+* `py-http-signature at GitHub`_
+* `py-smartdc Documentation`_ & API reference
 * `Joyent CloudAPI Documentation`_
 
 .. _Joyent: http://joyentcloud.com/
@@ -41,12 +43,14 @@ Python SmartDataCenter Links
 .. _Joyent CloudAPI Documentation: CloudAPI_
 .. _http-signature: 
     https://github.com/joyent/node-http-signature/blob/master/http_signing.md
-.. _py-http-signature: https://github.com/atl/py-http-signature
 .. _requests: https://github.com/kennethreitz/requests
 .. _PyCrypto: http://pypi.python.org/pypi/pycrypto
 .. _smartdc in PyPI: http://pypi.python.org/pypi/smartdc
-.. _GitHub: https://github.com/atl/py-smartdc
-.. _Python Documentation: http://packages.python.org/smartdc/
+.. _http_signature in PyPI: http://pypi.python.org/pypi/http_signature
+.. _py-http-signature: `http_signature in PyPI`_
+.. _py-http-signature at GitHub: https://github.com/atl/py-http-signature
+.. _py-smartdc at GitHub: https://github.com/atl/py-smartdc
+.. _py-smartdc Documentation: http://packages.python.org/smartdc/
 
 Installation
 ------------
@@ -166,6 +170,13 @@ A colleague and I wanted something Pythonic to fit into our preferred
 toolchain, and the easiest approach was to build it myself. Requests made some 
 aspects stupidly easy, which is why I created the dependency for the first 
 version.
+
+Authors
+-------
+
+`Adam T. Lindsay`_
+
+.. _Adam T. Lindsay: http://atl.me/
 
 License
 -------
