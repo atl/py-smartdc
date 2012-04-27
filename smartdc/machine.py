@@ -109,6 +109,17 @@ class Machine(object):
             module=self.__module__, cls=self.__class__.__name__, 
             name=self.name, dc=dc)
     
+    def __eq__(self, other):
+        if isinstance(other, dict):
+            return self.id == other.get('id')
+        elif isinstance(other, Machine):
+            return self.id == other.id
+        else:
+            return False
+    
+    def __ne__(self, other):
+        return not self.__eq__(other)
+    
     def _save(self, data):
         """
         Take the data from a dict and commit them to appropriate attributes.
