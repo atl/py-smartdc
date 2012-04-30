@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 with open('README.rst') as file:
     long_description = file.read()
 with open('CHANGES.rst') as file:
-    long_description += '/n/n' + file.read()
+    long_description += '\n\n' + file.read()
 
 setup(
     name='smartdc',

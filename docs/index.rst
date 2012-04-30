@@ -5,18 +5,12 @@
 
 .. include:: ../README.rst
 
-Tutorial
-========
-
-.. toctree::
-   
-   tutorial
-
-API Documentation
-=================
+Documentation
+=============
 .. toctree::
    :maxdepth: 4
    
+   tutorial
    datacenter
    machine
 

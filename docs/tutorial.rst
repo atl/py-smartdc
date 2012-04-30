@@ -1,5 +1,5 @@
-Usage
------
+Tutorial
+========
 
 This is an example session as mini-tutorial. Import the library and initialize 
 the DataCenter, which is effectively our persistent connection object::
@@ -81,16 +81,13 @@ the datacenter's machines::
     test_machine == east.machines(name='test-machine')[0]
 
 Now that we have both provisioned a machine and ensured that it is running, we 
-can connect to it and list the installed packages. In order to do this (for 
-the purposes of this tutorial only), we use the `ssh`_ package, which is a 
-fork of ``paramiko`` and a dependency of ``fab``. After a 
+can connect to it and list the installed packages. In order to do this, we use 
+the `ssh`_ package, which is a fork of ``paramiko`` and a dependency of 
+``fab``. We use it internally to connect with ``ssh-agent`` if available. 
 
-    pip install ssh 
-
-...at the command line, we can continue connecting with the remote machine 
-itself. We can find a user-accessible IP address using the ``public_ips`` 
-property of our machine instance. We use the key that we know works with the 
-Smart Data Center, and connect using the ``admin`` account::
+We find the user-accessible IP address using the ``public_ips`` property of 
+our machine instance. We use the key that we know works with the Smart Data 
+Center, and connect using the ``admin`` account::
 
     import ssh
     
