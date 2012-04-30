@@ -8,12 +8,13 @@ This is a third-party effort.
 
 This module currently supports:
 
-* Secure connections (via py-http-signature_)
+* Secure connections (via py-http-signature_ and ssh-agent, when available)
 * Key management
 * Browsing and access of datacenters, datasets (OS distributions/VM bundles), 
   and packages (machine sizes and resources)
 * Machine listing, search, creation, management 
   (start/stop/reboot/resize/delete), snapshotting, metadata, and tags
+* Installing boot scripts on machines
 
 It attempts to provide Pythonic objects (for Data Centers, Machines and 
 Snapshots) and convenience methods only when appropriate, and otherwise deals 

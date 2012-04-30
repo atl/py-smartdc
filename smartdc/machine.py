@@ -206,6 +206,17 @@ class Machine(object):
         self._save(data)
     
     def credentials(self):
+        """
+        ::
+        
+            GET /:login/machines/:id?credentials=True
+        
+        :Returns: known login-password pairs for the machine
+        :rtype: :py:class:`dict`
+        
+        Provisionally re-fetch the machine information with the credentials 
+        flag enabled.
+        """
         if not self._credentials:
             self.refresh(credentials=True)
         return self._credentials
