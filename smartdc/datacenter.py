@@ -581,7 +581,7 @@ class DataCenter(object):
         return [Machine(datacenter=self, data=m) for m in machines]
     
     def create_machine(self, name=None, package=None, dataset=None,
-            metadata=None, tags=None, boot_script=None):
+            metadata=None, tags=None, boot_script=None, credentials=False):
         """
         ::
         
@@ -611,6 +611,13 @@ class DataCenter(object):
             identifying information for filtering when querying for machines
         :type tags: :py:class:`dict`
         
+        :param boot_script: path to a file to upload for execution on boot
+        :type boot_script: :py:class:`basestring` as file path
+        
+        :param credentials: whether to include the generated credentials for 
+            this machine
+        :type credentials: :py:class:`bool`
+        
         :rtype: :py:class:`smartdc.machine.Machine`
         
         If `package` or `dataset` are passed a :py:class:`dict` containing a 
@@ -639,6 +646,8 @@ class DataCenter(object):
         if boot_script:
             with open(boot_script) as f:
                 params['metadata.user-script'] = f.read()
+        if credentials:
+            params['credentials'] = credentials
         j, r = self.request('POST', 'machines', data=params)
         return Machine(datacenter=self, data=j)
     
