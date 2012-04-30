@@ -382,7 +382,7 @@ class Machine(object):
         
             POST /:login/machines/:id/metadata
         
-        Replace the existing boot_script for the machine with the data in the 
+        Replace the existing boot script for the machine with the data in the 
         named file.
         """
         data = {}
@@ -397,9 +397,7 @@ class Machine(object):
         
             DELETE /:login/machines/:id/metadata/user-script
         
-        Deletes the machine metadata contained at 'key'. Also explicitly 
-        requests and returns the machine metadata so that the local copy stays 
-        synchronized.
+        Deletes any existing boot script on the machine.
         """
         j, r = self.datacenter.request('DELETE', self.path + 
                 '/metadata/user-script')
