@@ -627,7 +627,7 @@ class DataCenter(object):
         if boot_script:
             with open(boot_script) as f:
                 params['metadata.user-script'] = f.read()
-        j, r = self.request('POST', 'machines', params=params)
+        j, r = self.request('POST', 'machines', data=params)
         return Machine(datacenter=self, data=j)
     
     def machine(self, machine_id):

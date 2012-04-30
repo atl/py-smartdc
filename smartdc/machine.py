@@ -351,7 +351,7 @@ class Machine(object):
         in the :py:attr:`metadata` attribute and returns it.
         """
         j, _ = self.datacenter.request('POST', self.path + '/metadata', 
-                    params=kwargs)
+                    data=kwargs)
         self.metadata = j
         return j
     
@@ -417,7 +417,7 @@ class Machine(object):
         already set for the machine.
         """
         j, _ = self.datacenter.request('POST', self.path + '/tags', 
-            params=kwargs)
+            data=kwargs)
         return j
     
     def get_tag(self, tag):
@@ -501,7 +501,7 @@ class Machine(object):
         """
         params = {'name': name}
         j, _ = self.datacenter.request('POST', self.path + '/snapshots', 
-            params=params)
+            data=params)
         return Snapshot(machine=self, data=j, name=name)
     
     def start_from_snapshot(self, name):
