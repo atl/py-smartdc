@@ -376,6 +376,35 @@ class Machine(object):
         r.raise_for_status()
         return self.get_metadata()
     
+    def set_boot_script(self, filename):
+        """
+        ::
+        
+            POST /:login/machines/:id/metadata
+        
+        Replace the existing boot_script for the machine with the data in the 
+        named file.
+        """
+        data = {}
+        with open(filename) as f:
+            data['user-script'] = f.read()
+        j, _ = self.datacenter.request('POST', self.path + '/metadata', 
+                    data=data)
+    
+    def delete_boot_script(self, key):
+        """
+        ::
+        
+            DELETE /:login/machines/:id/metadata/user-script
+        
+        Deletes the machine metadata contained at 'key'. Also explicitly 
+        requests and returns the machine metadata so that the local copy stays 
+        synchronized.
+        """
+        j, r = self.datacenter.request('DELETE', self.path + 
+                '/metadata/user-script')
+        r.raise_for_status()
+    
     def delete_all_metadata(self):
         """
         ::
