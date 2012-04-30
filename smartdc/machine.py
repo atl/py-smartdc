@@ -139,7 +139,7 @@ class Machine(object):
         if not hasattr(self, '_credentials'):
             self._credentials = {}
         self._credentials.update(self.metadata.pop('credentials', {}))
-        self.boot_script = self.metadata.pop('user-script')
+        self.boot_script = self.metadata.pop('user-script', None)
         self.created = dt_time(data.get('created'))
         self.updated = dt_time(data.get('updated'))
     
