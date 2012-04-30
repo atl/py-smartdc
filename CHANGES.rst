@@ -4,8 +4,9 @@ Changes
 0.1.7 (2012-04-30)
 ~~~~~~~~~~~~~~~~~~
 * Renamed metadata_dict and tag_dict parameters to metadata and tags
+* POST data as JSON, rather than encoded in URL
 * Added boot_script option on machine creation
-* Process credentials
+* Process and expose credentials
 
 0.1.6 (2012-04-30)
 ~~~~~~~~~~~~~~~~~~
