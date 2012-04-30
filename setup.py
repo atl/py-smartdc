@@ -7,7 +7,7 @@ with open('CHANGES.rst') as file:
 
 setup(
     name='smartdc',
-    version='0.1.6',
+    version='0.1.7',
     description="Joyent SmartDataCenter CloudAPI connector using http-signature authentication via Requests",
     long_description=long_description,
     classifiers=[
