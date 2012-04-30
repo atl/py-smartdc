@@ -43,7 +43,8 @@ class Machine(object):
     cache in most cases, instead requiring the user to explicitly update with 
     a :py:meth:`refresh` call.
     """
-    def __init__(self, datacenter, machine_id=None, data=None):
+    def __init__(self, datacenter, machine_id=None, data=None, 
+            credentials=False):
         """
         :param datacenter: datacenter that contains this machine
         :type datacenter: :py:class:`smartdc.datacenter.DataCenter`
@@ -53,6 +54,9 @@ class Machine(object):
         
         :param data: raw data for instantiation
         :type data: :py:class:`dict`
+        
+        :param credentials: whether credentials should be returned
+        :type credentials: :py:class:`bool`
         
         Typically, a :py:class:`smartdc.machine.Machine` object is 
         instantiated automatically by a 
@@ -132,6 +136,10 @@ class Machine(object):
         self.disk = data.get('disk')
         self.ips = data.get('ips', [])
         self.metadata = data.get('metadata', {})
+        if not hasattr(self, '_credentials'):
+            self._credentials = {}
+        self._credentials.update(self.metadata.pop('credentials', {}))
+        self.boot_script = self.metadata.pop('user-script')
         self.created = dt_time(data.get('created'))
         self.updated = dt_time(data.get('updated'))
     
@@ -183,7 +191,7 @@ class Machine(object):
         """
         return datacenter.create_machine(**kwargs)
     
-    def refresh(self):
+    def refresh(self, credentials=False):
         """
         ::
         
@@ -193,8 +201,14 @@ class Machine(object):
         :py:class:`smartdc.machine.Machine` from the datacenter and commit the 
         values locally.
         """
-        data = self.datacenter.raw_machine_data(self.id)
+        data = self.datacenter.raw_machine_data(self.id, 
+                credentials=credentials)
         self._save(data)
+    
+    def credentials(self):
+        if not self._credentials:
+            self.refresh(credentials=True)
+        return self._credentials
     
     def status(self):
         """
@@ -388,8 +402,10 @@ class Machine(object):
         data = {}
         with open(filename) as f:
             data['user-script'] = f.read()
-        j, _ = self.datacenter.request('POST', self.path + '/metadata', 
+        j, r = self.datacenter.request('POST', self.path + '/metadata', 
                     data=data)
+        r.raise_for_status()
+        self.boot_script = data['user-script']
     
     def delete_boot_script(self, key):
         """
@@ -402,6 +418,7 @@ class Machine(object):
         j, r = self.datacenter.request('DELETE', self.path + 
                 '/metadata/user-script')
         r.raise_for_status()
+        self.boot_script = None
     
     def delete_all_metadata(self):
         """

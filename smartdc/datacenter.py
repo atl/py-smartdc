@@ -175,7 +175,7 @@ class DataCenter(object):
             self.auth = HTTPSignatureAuth(key_id=key_id, secret=secret, 
                 allow_agent=allow_agent)
     
-    def request(self, method, path, headers=None, **kwargs):
+    def request(self, method, path, headers=None, data=None, **kwargs):
         """
         (Primarily) internal method for making all requests to the datacenter.
         
@@ -196,9 +196,13 @@ class DataCenter(object):
         request_headers.update(self.default_headers)
         if headers:
             request_headers.update(headers)
+        if data:
+            data = json.dumps(data)
+            kwargs['data'] = data
         resp = requests.request(method, full_path, auth=self.auth, 
             headers=request_headers, config=self.config, **kwargs)
-        if resp.status_code == 401 and self.auth and self.auth.signer._agent_key:
+        if (resp.status_code == 401 and self.auth and 
+                self.auth.signer._agent_key):
             self.auth.signer.swap_keys()
             return self.request(method, path, headers=headers, **kwargs)
         if 400 <= resp.status_code < 499:
@@ -454,7 +458,7 @@ class DataCenter(object):
         num = r.headers.get('x-resource-count', 0)
         return int(num)
     
-    def raw_machine_data(self, machine_id):
+    def raw_machine_data(self, machine_id, credentials=False):
         """
         ::
         
@@ -466,9 +470,13 @@ class DataCenter(object):
         
         Primarily used internally to get a raw dict for a single machine.
         """
+        params = {}
         if isinstance(machine_id, dict):
             machine_id = machine_id['id']
-        j, _ = self.request('GET', 'machines/' + str(machine_id))
+        if credentials:
+            params['credentials'] = True
+        j, _ = self.request('GET', 'machines/' + str(machine_id), 
+                params=params)
         return j
     
     def machines(self, machine_type=None, name=None, dataset=None, state=None, 
