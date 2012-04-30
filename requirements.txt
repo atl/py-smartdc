@@ -1,4 +1,5 @@
 pycrypto
+ssh
 http-signature
 requests
 Sphinx

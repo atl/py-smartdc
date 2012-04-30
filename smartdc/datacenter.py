@@ -42,7 +42,8 @@ class DataCenter(object):
     attribute access).
     """
     def __init__(self, location=None, key_id=None, secret='~/.ssh/id_rsa', 
-                headers=None, login=None, config=None, known_locations=None):
+                headers=None, login=None, config=None, known_locations=None,
+                allow_agent=True):
         """
         A :py:class:`smartdc.datacenter.DataCenter` object may be instantiated 
         without any parameters, but practically speaking, the `key_id` and 
@@ -90,7 +91,8 @@ class DataCenter(object):
         self.known_locations = known_locations or KNOWN_LOCATIONS
         self.config = config or {}
         if key_id and secret:
-            self.auth = HTTPSignatureAuth(key_id=key_id, secret=secret)
+            self.auth = HTTPSignatureAuth(key_id=key_id, secret=secret,
+                allow_agent=allow_agent)
         else:
             self.auth = None
         self.default_headers = DEFAULT_HEADERS
@@ -157,7 +159,7 @@ class DataCenter(object):
         else:
             return 'https://' + self.location + API_HOST_SUFFIX
     
-    def authenticate(self, key_id=None, secret=None):
+    def authenticate(self, key_id=None, secret=None, allow_agent=True):
         """
         :param key_id: SmartDC identifier for the ssh key
         :type key_id: :py:class:`basestring`
@@ -170,7 +172,8 @@ class DataCenter(object):
         authenticate with a `key_id` and `secret`.
         """
         if key_id and secret:
-            self.auth = HTTPSignatureAuth(key_id=key_id, secret=secret)
+            self.auth = HTTPSignatureAuth(key_id=key_id, secret=secret, 
+                allow_agent=allow_agent)
     
     def request(self, method, path, headers=None, **kwargs):
         """
@@ -195,6 +198,9 @@ class DataCenter(object):
             request_headers.update(headers)
         resp = requests.request(method, full_path, auth=self.auth, 
             headers=request_headers, config=self.config, **kwargs)
+        if resp.status_code == 401 and self.auth and self.auth.signer._agent_key:
+            self.auth.signer.swap_keys()
+            return self.request(method, path, headers=headers, **kwargs)
         if 400 <= resp.status_code < 499:
             if resp.content:
                 print >> sys.stderr, resp.content

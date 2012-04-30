@@ -25,10 +25,10 @@ Requirements
 * requests_
 * py-http-signature_
 * PyCrypto_ (required by py-http-signature)
+* ssh_ (used by py-http-signature for its ssh-agent integration)
 
 We assume that ``json`` is present because requests now requires py2.6 and 
-up. Although the tutorial uses the ``ssh`` package, there is no dependency by
-``py-smartdc`` on it.
+up.
 
 Python SmartDataCenter Links
 ----------------------------
@@ -47,6 +47,7 @@ Python SmartDataCenter Links
     https://github.com/joyent/node-http-signature/blob/master/http_signing.md
 .. _requests: https://github.com/kennethreitz/requests
 .. _PyCrypto: http://pypi.python.org/pypi/pycrypto
+.. _ssh: https://github.com/bitprophet/ssh
 .. _smartdc in PyPI: http://pypi.python.org/pypi/smartdc
 .. _http_signature in PyPI: http://pypi.python.org/pypi/http_signature
 .. _py-http-signature: `http_signature in PyPI`_
