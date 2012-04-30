@@ -25,7 +25,7 @@ Requirements
 * requests_
 * py-http-signature_
 * PyCrypto_ (required by py-http-signature)
-* ssh_ (used by py-http-signature for its ssh-agent integration)
+* ssh_ (used by py-http-signature for its ``ssh-agent`` integration)
 
 We assume that ``json`` is present because requests now requires py2.6 and 
 up.
@@ -94,7 +94,8 @@ Why?
 A colleague and I wanted something Pythonic to fit into our preferred 
 toolchain, and the easiest approach was to build it myself. Requests made some 
 aspects stupidly easy, which is why I created the dependency for the first 
-version.
+version. The colleague wanted integration with ``ssh-agent``, and using ssh_ 
+was the easiest path to that.
 
 Authors
 -------
