@@ -198,6 +198,9 @@ class Machine(object):
         
             GET /:login/machines/:id
         
+        :param credentials: whether to return machine passwords
+        :type credentials: :py:class:`bool`
+        
         Fetch the existing state and values for the 
         :py:class:`smartdc.machine.Machine` from the datacenter and commit the 
         values locally.
@@ -408,6 +411,10 @@ class Machine(object):
         
             POST /:login/machines/:id/metadata
         
+        :param filename: file path to the script to be uploaded and executed
+            at boot on the machine
+        :type filename: :py:class:`basestring`
+        
         Replace the existing boot script for the machine with the data in the 
         named file.
         """
@@ -419,7 +426,7 @@ class Machine(object):
         r.raise_for_status()
         self.boot_script = data['user-script']
     
-    def delete_boot_script(self, key):
+    def delete_boot_script(self):
         """
         ::
         

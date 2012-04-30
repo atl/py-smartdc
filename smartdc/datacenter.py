@@ -362,10 +362,11 @@ class DataCenter(object):
             GET /:login/datasets
         
         :Returns: the default dataset for this datacenter
-        :rtype: :py:class:`dict`
+        :rtype: :py:class:`dict` or ``None``
         
         Requests all the datasets in this datacenter, filters for the default, 
-        and returns the corresponding :py:class:`dict`.
+        and returns the corresponding :py:class:`dict`, if a default has been 
+        defined.
         """
         sets = filter(itemgetter('default'), self.datasets())
         if sets:
@@ -413,10 +414,10 @@ class DataCenter(object):
             GET /:login/packages
         
         :Returns: the default package for this datacenter
-        :rtype: :py:class:`dict`
+        :rtype: :py:class:`dict` or ``None``
         
         Requests all the packages in this datacenter, filters for the default, 
-        and returns the corresponding dict.
+        and returns the corresponding dict, if a default has been defined.
         """
         packages = filter(itemgetter('default'), self.packages())
         if packages:
@@ -444,14 +445,36 @@ class DataCenter(object):
         j, _ = self.request('GET', 'packages/' + str(name))
         return j
     
-    def num_machines(self):
+    def num_machines(self, machine_type=None, dataset=None, state=None, 
+            memory=None, tombstone=None, tags=None):
         """
         ::
         
             HEAD /:login/machines
         
-        :Returns: a count of the number of machines owned by the user at this
-            datacenter
+        Counts the number of machines total, or that match the predicates as
+        with :py:meth:`machines`.
+        
+        :param machine_type: virtualmachine or smartmachine
+        :type machine_type: :py:class:`basestring`
+        
+        :param dataset: unique ID or URN for a dataset
+        :type dataset: :py:class:`basestring` or :py:class:`dict`
+        
+        :param state: current running state
+        :type state: :py:class:`basestring`
+        
+        :param memory: current size of the RAM deployed for the machine (Mb)
+        :type memory: :py:class:`int`
+        
+        :param tombstone: include machines destroyed in the last N minutes
+        :type tombstone: :py:class:`int`
+        
+        :param tags: keys and values to query in the machines' tag space
+        :type tags: :py:class:`dict`
+        
+        :Returns: a count of the number of machines (matching the predicates) 
+            owned by the user at this datacenter
         :rtype: :py:class:`int`
         """
         _, r = self.request('HEAD', 'machines')
