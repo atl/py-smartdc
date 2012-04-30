@@ -569,7 +569,7 @@ class DataCenter(object):
         return [Machine(datacenter=self, data=m) for m in machines]
     
     def create_machine(self, name=None, package=None, dataset=None,
-            metadata=None, tags=None):
+            metadata=None, tags=None, boot_script=None):
         """
         ::
         
@@ -624,6 +624,9 @@ class DataCenter(object):
         if tags:
             for k, v in tags.items():
                 params['tag.' + str(k)] = v
+        if boot_script:
+            with open(boot_script) as f:
+                params['metadata.user-script'] = f.read()
         j, r = self.request('POST', 'machines', params=params)
         return Machine(datacenter=self, data=j)
     
