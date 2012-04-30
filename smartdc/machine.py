@@ -92,7 +92,8 @@ class Machine(object):
         """the :py:class:`smartdc.datacenter.DataCenter` object that holds 
         this machine"""
         if not data:
-            data = self.datacenter.raw_machine_data(self.id)
+            data = self.datacenter.raw_machine_data(self.id, 
+                    credentials=credentials)
         self._save(data)
     
     def __str__(self):
