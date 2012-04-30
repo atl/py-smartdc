@@ -466,6 +466,10 @@ class DataCenter(object):
         
         :param machine_id: identifier for the machine instance
         :type machine_id: :py:class:`basestring` or :py:class:`dict`
+        
+        :param credentials: whether the SDC should return machine credentials
+        :type credentials: :py:class:`bool`
+        
         :rtype: :py:class:`dict`
         
         Primarily used internally to get a raw dict for a single machine.
@@ -638,7 +642,7 @@ class DataCenter(object):
         j, r = self.request('POST', 'machines', data=params)
         return Machine(datacenter=self, data=j)
     
-    def machine(self, machine_id):
+    def machine(self, machine_id, credentials=False):
         """
         ::
         
@@ -654,6 +658,7 @@ class DataCenter(object):
             machine_id = machine_id['id']
         elif isinstance(machine_id, Machine):
             machine_id = machine_id.id
-        return Machine(datacenter=self, machine_id=machine_id)
+        return Machine(datacenter=self, machine_id=machine_id, 
+                credentials=credentials)
     
 
