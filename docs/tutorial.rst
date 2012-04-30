@@ -1,8 +1,14 @@
 Tutorial
 ========
 
-This is an example session as mini-tutorial. Import the library and initialize 
-the DataCenter, which is effectively our persistent connection object::
+This is an example session as a mini-tutorial on SmartDC's most striking 
+features. 
+
+Setup
+-----
+
+We begin by importing the library and initializing the DataCenter, which is 
+effectively our persistent connection object::
 
     from smartdc import DataCenter, DEBUG_CONFIG
     
@@ -33,6 +39,9 @@ return the default assigned by the datacenter::
 
     east.default_package()
 
+Packages, datasets, and other resources
+---------------------------------------
+
 Packages, datasets and most other CloudAPI entities are returned as dicts or 
 lists of dicts. You can extract the unique identifiers pointing to these 
 entities from these representations or pass the dicts themselves to methods 
@@ -47,10 +56,13 @@ recent one. Handy.
 
     latest64 = east.dataset('sdc:sdc:smartos64:')
 
-Let's save a boot script for later upload::
+While we're setting up, let's save a boot script for later upload::
 
     with open('./test-script.sh', 'w') as f:
         f.write('#!/usr/bin/sh\n\ntouch /home/admin/FTW\n')
+
+Instantiating machines
+----------------------
 
 Sometimes we can create a smartmachine with no arguments at all: a default 
 dataset and a default package are usually defined by the datacenter, and a 
@@ -61,10 +73,10 @@ is also about exercising fine control::
                     package='Small 1GB', boot_script='./test-script.sh', 
                     tags={'type':'test'})
 
-This instantiates a ``smartdc.Machine`` object that has its own methods and
-properties that allow you to examine data about the remote machine controlled 
-via CloudAPI. Many methods correspond with the HTTP API driving it, but there 
-are additional convenience methods here.
+This instantiates a ``smartdc.machine.Machine`` object that has its own 
+methods and properties that allow you to examine data about the remote machine 
+controlled via CloudAPI. Many methods correspond with the HTTP API driving it, 
+but there are additional convenience methods here.
 
 For example, ``poll_while`` and ``poll_until`` block while continually polling 
 the datacenter for the machine's ``.state`` to be updated. Note that if you 
@@ -86,10 +98,13 @@ the datacenter's machines::
 
     test_machine == east.machines(name='test-machine')[0]
 
+Interacting with running instances
+----------------------------------
+
 Now that we have both provisioned a machine and ensured that it is running, we 
 can connect to it and list the installed packages. In order to do this, we use 
-the `ssh`_ package, which is a fork of ``paramiko`` and a dependency of 
-``fab``. We use it internally to connect with ``ssh-agent`` if available. 
+the `ssh`_ package. SmartDC uses it internally to connect with an 
+``ssh-agent`` if one is available.
 
 We find the user-accessible IP address using the ``public_ips`` property of 
 our machine instance. We use the key that we know works with the Smart Data 
@@ -125,14 +140,20 @@ machine::
     
     test_machine.delete()
 
+Advanced example
+----------------
+
 If you have accumulated many test instances in a datacenter and you need to 
 shut them all down quickly, you might consider the following use of a thread 
-pool::
+pool. This example is predicated upon the machines being given a common tag.
+
+::
 
     from operator import methodcaller
     from multiprocessing.dummy import Pool
     
     simultaneous = Pool(min(east.num_machines(), 8))
+    
     all_machines = east.machines(tags={'type':'test'})
     
     simultaneous.map(methodcaller('stop'), all_machines)
