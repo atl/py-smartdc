@@ -1,11 +1,11 @@
 from setuptools import setup, find_packages
 
-with open('readme.rst') as file:
+with open('README.rst') as file:
     long_description = file.read()
 
 setup(
     name='smartdc',
-    version='0.1.5',
+    version='0.1.6',
     description="Joyent SmartDataCenter CloudAPI connector using http-signature authentication via Requests",
     long_description=long_description,
     classifiers=[
