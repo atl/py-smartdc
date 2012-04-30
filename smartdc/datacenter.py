@@ -472,7 +472,7 @@ class DataCenter(object):
         return j
     
     def machines(self, machine_type=None, name=None, dataset=None, state=None, 
-            memory=None, tombstone=None, tag_dict=None, credentials=False, 
+            memory=None, tombstone=None, tags=None, credentials=False, 
             paged=False, limit=None, offset=None):
         """
         ::
@@ -502,8 +502,8 @@ class DataCenter(object):
         :param tombstone: include machines destroyed in the last N minutes
         :type tombstone: :py:class:`int`
         
-        :param tag_dict: keys and values to query in the machines' tag space
-        :type tag_dict: :py:class:`dict`
+        :param tags: keys and values to query in the machines' tag space
+        :type tags: :py:class:`dict`
         
         :param credentials: whether to include the generated credentials for 
             machines, if present
@@ -539,8 +539,8 @@ class DataCenter(object):
             params['memory'] = memory
         if tombstone:
             params['tombstone'] = tombstone
-        if tag_dict:
-            for k, v in tag_dict.items():
+        if tags:
+            for k, v in tags.items():
                 params['tag.' + str(k)] = v
         if credentials:
             params['credentials'] = True
@@ -569,7 +569,7 @@ class DataCenter(object):
         return [Machine(datacenter=self, data=m) for m in machines]
     
     def create_machine(self, name=None, package=None, dataset=None,
-            metadata_dict=None, tag_dict=None):
+            metadata=None, tags=None):
         """
         ::
         
@@ -591,13 +591,13 @@ class DataCenter(object):
             unique ID or URN
         :type dataset: :py:class:`basestring` or :py:class:`dict`
         
-        :param metadata_dict: keys & values with arbitrary supplementary 
-            details for the machine
-        :type metadata_dict: :py:class:`dict`
+        :param metadata: keys & values with arbitrary supplementary 
+            details for the machine, accessible from the machine itself
+        :type metadata: :py:class:`dict`
         
-        :param tag_dict: keys & values with arbitrary supplementary 
+        :param tags: keys & values with arbitrary supplementary 
             identifying information for filtering when querying for machines
-        :type tag_dict: :py:class:`dict`
+        :type tags: :py:class:`dict`
         
         :rtype: :py:class:`smartdc.machine.Machine`
         
@@ -618,11 +618,11 @@ class DataCenter(object):
             if isinstance(dataset, dict):
                 dataset = dataset.get('urn', dataset['id'])
             params['dataset'] = dataset
-        if metadata_dict:
-            for k, v in metadata_dict.items():
+        if metadata:
+            for k, v in metadata.items():
                 params['metadata.' + str(k)] = v
-        if tag_dict:
-            for k, v in tag_dict.items():
+        if tags:
+            for k, v in tags.items():
                 params['tag.' + str(k)] = v
         j, r = self.request('POST', 'machines', params=params)
         return Machine(datacenter=self, data=j)
