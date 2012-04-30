@@ -5,6 +5,13 @@
 
 .. include:: ../README.rst
 
+Tutorial
+========
+
+.. toctree::
+   
+   tutorial
+
 API Documentation
 =================
 .. toctree::
