@@ -47,18 +47,24 @@ recent one. Handy.
 
     latest64 = east.dataset('sdc:sdc:smartos64:')
 
+Let's save a boot script for later upload::
+
+    with open('./test-script.sh', 'w') as f:
+        f.write('#!/usr/bin/sh\n\ntouch /home/admin/FTW\n')
+
 Sometimes we can create a smartmachine with no arguments at all: a default 
 dataset and a default package are usually defined by the datacenter, and a 
 unique name will also be defined if you omit one. However, this python package 
 is also about exercising fine control::
 
-    test_machine = east.create_machine(name='test-machine', dataset=latest64
-                    package='Small 1GB')
+    test_machine = east.create_machine(name='test-machine', dataset=latest64,
+                    package='Small 1GB', boot_script='./test-script.sh', 
+                    tags={'type':'test'})
 
 This instantiates a ``smartdc.Machine`` object that has its own methods and
 properties that allow you to examine data about the remote machine controlled 
 via CloudAPI. Many methods correspond with the HTTP API driving it, but there 
-are also convenience methods here, as well.
+are additional convenience methods here.
 
 For example, ``poll_while`` and ``poll_until`` block while continually polling 
 the datacenter for the machine's ``.state`` to be updated. Note that if you 
@@ -104,6 +110,10 @@ id-description pairs::
     
     dict(ln.split(None,1) for ln in rout)
 
+Let's take a look to see if the boot script fired::
+
+    print ssh_conn.exec_command('ls')[1].read()
+
 Close the connection, stop the machine, wait until stopped, and delete the 
 machine::
 
@@ -122,8 +132,8 @@ pool::
     from operator import methodcaller
     from multiprocessing.dummy import Pool
     
-    simultaneous = Pool(east.num_machines())
-    all_machines = east.machines()
+    simultaneous = Pool(min(east.num_machines(), 8))
+    all_machines = east.machines(tags={'type':'test'})
     
     simultaneous.map(methodcaller('stop'), all_machines)
     
@@ -133,7 +143,7 @@ pool::
     
     simultaneous.map(methodcaller('delete'), all_machines)
     
-    east.num_machines() == 0
+    east.num_machines(tags={'type':'test'}) == 0
 
 To learn more, you can read the API documentation for both the `DataCenter`_ 
 and `Machine`_ objects.
