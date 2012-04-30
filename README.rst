@@ -80,6 +80,12 @@ Quickstart
     import urllib2
     
     urllib2.urlopen('http://' + sm.public_ips[0]).headers.dict
+    
+    sm.stop()
+    
+    sm.poll_until('stopped')
+    
+    sm.delete()
 
 Why?
 ----
