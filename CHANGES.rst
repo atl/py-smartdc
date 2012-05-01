@@ -7,7 +7,7 @@ Changes
 * POST data as JSON, rather than encoded in URL
 * Added boot_script option on machine creation
 * Process and expose credentials
-* Slight tutorial cleanup
+* Slight tutorial and other documentation cleanup
 
 0.1.6 (2012-04-30)
 ~~~~~~~~~~~~~~~~~~
