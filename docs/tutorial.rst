@@ -17,11 +17,12 @@ effectively our persistent connection object::
 
 The ``key_id`` is the only parameter that requires user input. It has the form 
 ``/<username>/keys/<key_name>`` with the ``key_name`` being the label attached 
-to the Public SSH key uploaded to your Smart Data Center (my.joyentcloud.com) 
-account (and corresponding to the private key identified in the ``secret`` 
-parameter). By default, ``py-smartdc`` looks for your private ssh key at the 
-above-listed path. The ``DEBUG_CONFIG`` echoes each CloudAPI connection to 
-``stderr`` to aid in debugging. 
+to the Public SSH key uploaded to your Smart Data Center 
+(https://my.joyentcloud.com) account (and corresponding to the private key 
+identified in the ``secret`` parameter). By default, ``py-smartdc`` looks for 
+an ``ssh-agent``, and then your private ssh key at the above-listed path. The 
+``DEBUG_CONFIG`` echoes each CloudAPI connection to ``stderr`` to aid in 
+debugging. 
 
 Once connected to a datacenter, you can look at all sorts of account 
 information, such as listing your uploaded public SSH keys::
@@ -45,12 +46,12 @@ Packages, datasets, and other resources
 Packages, datasets and most other CloudAPI entities are returned as dicts or 
 lists of dicts. You can extract the unique identifiers pointing to these 
 entities from these representations or pass the dicts themselves to methods 
-that refer to these entities. The name, id, or urn -- as appropriate -- is 
+that refer to these entities. The name, id, or URN -- as appropriate -- is 
 extracted and passed to the CloudAPI.
 
-Datasets, as it turns out, don't require a fully qualified URN: the CloudAPI 
-currently appears to be clever enough to resolve an ambiguous URN to the most 
-recent one. Handy.
+Identifying datasets, as it turns out, doesn't require a fully qualified URN: 
+the CloudAPI currently appears to be clever enough to resolve an ambiguous URN 
+to the most recent one. Handy.
 
 ::
 
@@ -89,12 +90,13 @@ impatient or conscientious.
 
     test_machine.poll_while('provisioning', interval=1)
 
-This Machine object is the same as what would be instantiated when listing 
-machines from the datacenter. When obtaining lists of machine resources from
-the Smart Data Center, the DataCenter object method returns instantiated 
-Machine objects that are the same as those that are freshly created. You can 
-quickly demonstrate this to yourself by searching for the new machine amongst
-the datacenter's machines::
+The Machine object we are working with is the same as what would be 
+instantiated when listing machines from the datacenter or directly 
+instantiated on a :py:class:`smartdc.machine.Machine` object with a datacenter 
+and id. When obtaining lists of machine resources from the Smart Data Center, 
+the DataCenter object method returns instantiated Machine objects that are the 
+same as those that are freshly created. You can quickly demonstrate this to 
+yourself by searching for the new machine amongst the datacenter's machines::
 
     test_machine == east.machines(name='test-machine')[0]
 
@@ -102,9 +104,11 @@ Interacting with running instances
 ----------------------------------
 
 Now that we have both provisioned a machine and ensured that it is running, we 
-can connect to it and list the installed packages. In order to do this, we use 
-the `ssh`_ package. SmartDC uses it internally to connect with an 
-``ssh-agent`` if one is available.
+can connect to it and perform some remote commands. In order to do this, we 
+use the `ssh`_ package. SmartDC uses it internally to connect with an 
+``ssh-agent`` if one is available. (For more extensive workflows, Fabric_, 
+which shares most of SmartDC's dependencies, is commonly used, but we don't 
+use it for this illustrative tutorial.)
 
 We find the user-accessible IP address using the ``public_ips`` property of 
 our machine instance. We use the key that we know works with the Smart Data 
@@ -145,24 +149,25 @@ Advanced example
 
 If you have accumulated many test instances in a datacenter and you need to 
 shut them all down quickly, you might consider the following use of a thread 
-pool. This example is predicated upon the machines being given a common tag.
+pool. This particular example usage is predicated upon the machines being 
+given a common tag.
 
 ::
 
     from operator import methodcaller
     from multiprocessing.dummy import Pool
     
-    simultaneous = Pool(min(east.num_machines(), 8))
+    simultaneous = Pool(min(east.num_machines(tags={'type':'test'}), 8))
     
-    all_machines = east.machines(tags={'type':'test'})
+    test_machines = east.machines(tags={'type':'test'})
     
-    simultaneous.map(methodcaller('stop'), all_machines)
+    simultaneous.map(methodcaller('stop'), test_machines)
     
-    simultaneous.map(methodcaller('poll_until','stopped'), all_machines)
+    simultaneous.map(methodcaller('poll_until','stopped'), test_machines)
     
-    simultaneous.map(methodcaller('status'), all_machines)
+    simultaneous.map(methodcaller('status'), test_machines)
     
-    simultaneous.map(methodcaller('delete'), all_machines)
+    simultaneous.map(methodcaller('delete'), test_machines)
     
     east.num_machines(tags={'type':'test'}) == 0
 
@@ -170,5 +175,6 @@ To learn more, you can read the API documentation for both the `DataCenter`_
 and `Machine`_ objects.
 
 .. _ssh: https://github.com/bitprophet/ssh
+.. _Fabric: http://docs.fabfile.org/
 .. _DataCenter: http://packages.python.org/smartdc/datacenter.html
 .. _Machine: http://packages.python.org/smartdc/machine.html
