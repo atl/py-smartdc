@@ -30,5 +30,5 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     zip_safe=True,
-    install_requires=['requests','pycrypto','http-signature'],
+    install_requires=['requests','http-signature'],
 )
