@@ -8,6 +8,7 @@ Changes
 * Added boot_script option on machine creation
 * Process and expose credentials
 * Slight tutorial and other documentation cleanup
+* Local filtering on datasets and packages
 
 0.1.6 (2012-04-30)
 ~~~~~~~~~~~~~~~~~~

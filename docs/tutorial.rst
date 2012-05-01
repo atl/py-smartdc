@@ -40,6 +40,12 @@ return the default assigned by the datacenter::
 
     east.default_package()
 
+...or filtering for packages or datasets that match a regular expression::
+
+    sdc.packages('high[- ]cpu')
+    
+    east.datasets('smartos(64)?:')
+
 Packages, datasets, and other resources
 ---------------------------------------
 

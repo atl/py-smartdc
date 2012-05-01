@@ -1,6 +1,7 @@
 import sys
 import json
 from operator import itemgetter
+import re
 
 import requests
 from http_signature.requests_auth import HTTPSignatureAuth
@@ -30,6 +31,16 @@ DEFAULT_HEADERS = {
 }
 
 DEBUG_CONFIG = {'verbose': sys.stderr}
+
+
+def search_dicts(dicts, predicate, fields):
+    matcher = re.compile(predicate, re.IGNORECASE)
+    for d in dicts:
+        m = [d for f in fields if matcher.search(d.get(f, ''))]
+        if m:
+            yield m[0]
+            continue
+
 
 class DataCenter(object):
     """
@@ -342,18 +353,30 @@ class DataCenter(object):
         dc.auth = self.auth
         return dc
     
-    def datasets(self):
+    def datasets(self, search=None, fields=('description', 'urn')):
         """
         ::
         
             GET /:login/datasets
+        
+        :param search: optionally filter (locally) with a regular expression 
+            search on the listed fields
+        :type search: :py:class:`basestring` that compiles as a regular 
+            expression
+        
+        :param fields: filter on the listed fields (defaulting to 
+            ``description`` and ``urn``)
+        :type fields: :py:class:`list` of :py:class:`basestring`\s
         
         :Returns: datasets (operating system templates) available in this 
             datacenter 
         :rtype: :py:class:`list` of :py:class:`dict`\s
         """
         j, _ = self.request('GET', 'datasets')
-        return j
+        if search:
+            return list(search_dicts(j, search, fields))
+        else:
+            return j
     
     def default_dataset(self):
         """
@@ -394,18 +417,29 @@ class DataCenter(object):
         j, _ = self.request('GET', 'datasets/' + str(dataset_id))
         return j
     
-    def packages(self):
+    def packages(self, search=None, fields=('name',)):
         """
         ::
         
             GET /:login/packages
+        
+        :param search: optionally filter (locally) with a regular expression 
+            search on the listed fields
+        :type search: :py:class:`basestring` that compiles as a regular 
+            expression
+        
+        :param fields: filter on the listed fields (defaulting to ``name``\)
+        :type fields: :py:class:`list` of :py:class:`basestring`\s
         
         :Returns: packages (machine "sizes", with resource types and values) 
             available in this datacenter.
         :rtype: :py:class:`list` of :py:class:`dict`\s
         """
         j, _ = self.request('GET', 'packages')
-        return j
+        if search:
+            return list(search_dicts(j, search, fields))
+        else:
+            return j
     
     def default_package(self):
         """
