@@ -4,8 +4,8 @@ Tutorial
 This is an example session as a mini-tutorial on SmartDC's most striking 
 features. 
 
-Setup
------
+Datacenters and setting up a connection
+---------------------------------------
 
 We begin by importing the library and initializing the DataCenter, which is 
 effectively our persistent connection object::
@@ -33,21 +33,18 @@ Given one datacenter, you can connect to another with your existing
 credentials and preferences::
 
     east = sdc.datacenter('us-east-1')
-    
-``py-smartdc`` defines a few convenience functions beyond the ones connecting 
-to the CloudAPI, such as filtering through all the packages or datasets to 
-return the default assigned by the datacenter::
 
-    east.default_package()
+While we're setting up, let's save a boot script for later upload::
 
-...or filtering for packages or datasets that match a regular expression::
+    with open('./test-script.sh', 'w') as f:
+        f.write('#!/usr/bin/sh\n\ntouch /home/admin/FTW\n')
 
-    sdc.packages('high[- ]cpu')
-    
-    east.datasets('smartos(64)?:')
+Packages and datasets
+---------------------
 
-Packages, datasets, and other resources
----------------------------------------
+You can list packages and datasets available at a given datacenter::
+
+    east.datasets()
 
 Packages, datasets and most other CloudAPI entities are returned as dicts or 
 lists of dicts. You can extract the unique identifiers pointing to these 
@@ -55,26 +52,35 @@ entities from these representations or pass the dicts themselves to methods
 that refer to these entities. The name, id, or URN -- as appropriate -- is 
 extracted and passed to the CloudAPI.
 
-Identifying datasets, as it turns out, doesn't require a fully qualified URN: 
-the CloudAPI currently appears to be clever enough to resolve an ambiguous URN 
-to the most recent one. Handy.
+Identifying individual datasets, as it turns out, doesn't require a fully 
+qualified URN: the CloudAPI currently appears to be clever enough to resolve 
+an ambiguous URN to the most recent one. Handy.
 
 ::
 
     latest64 = east.dataset('sdc:sdc:smartos64:')
 
-While we're setting up, let's save a boot script for later upload::
+``py-smartdc`` defines a few convenience functions beyond the ones offering 
+raw results directly from the CloudAPI, such as filtering through available 
+packages or datasets to return the default assigned by the datacenter::
 
-    with open('./test-script.sh', 'w') as f:
-        f.write('#!/usr/bin/sh\n\ntouch /home/admin/FTW\n')
+    east.default_package()
+
+...or locally filtering for packages or datasets that match a regular 
+expression::
+
+    sdc.packages('high[- ]cpu')
+    
+    east.datasets('smartos(64)?:')
 
 Instantiating machines
 ----------------------
 
 Sometimes we can create a smartmachine with no arguments at all: a default 
 dataset and a default package are usually defined by the datacenter, and a 
-unique name will also be defined if you omit one. However, this python package 
-is also about exercising fine control::
+unique name will always be defined if you omit one. However, besides valuing 
+convenience and terseness, this python package is also about exercising fine 
+control::
 
     test_machine = east.create_machine(name='test-machine', dataset=latest64,
                     package='Small 1GB', boot_script='./test-script.sh', 
@@ -83,7 +89,7 @@ is also about exercising fine control::
 This instantiates a ``smartdc.machine.Machine`` object that has its own 
 methods and properties that allow you to examine data about the remote machine 
 controlled via CloudAPI. Many methods correspond with the HTTP API driving it, 
-but there are additional convenience methods here.
+but there are additional convenience methods here, as well.
 
 For example, ``poll_while`` and ``poll_until`` block while continually polling 
 the datacenter for the machine's ``.state`` to be updated. Note that if you 
@@ -94,15 +100,16 @@ impatient or conscientious.
 
 ::
 
-    test_machine.poll_while('provisioning', interval=1)
+    test_machine.poll_while('provisioning', interval=3)
 
 The Machine object we are working with is the same as what would be 
 instantiated when listing machines from the datacenter or directly 
 instantiated on a :py:class:`smartdc.machine.Machine` object with a datacenter 
 and id. When obtaining lists of machine resources from the Smart Data Center, 
 the DataCenter object method returns instantiated Machine objects that are the 
-same as those that are freshly created. You can quickly demonstrate this to 
-yourself by searching for the new machine amongst the datacenter's machines::
+same as those yielded by the freshly created machines. You can quickly 
+demonstrate this to yourself by searching for the new machine amongst the 
+datacenter's machines::
 
     test_machine == east.machines(name='test-machine')[0]
 
