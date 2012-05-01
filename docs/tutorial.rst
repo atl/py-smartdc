@@ -86,10 +86,18 @@ control::
                     package='Small 1GB', boot_script='./test-script.sh', 
                     tags={'type':'test'})
 
-This instantiates a ``smartdc.machine.Machine`` object that has its own 
-methods and properties that allow you to examine data about the remote machine 
-controlled via CloudAPI. Many methods correspond with the HTTP API driving it, 
-but there are additional convenience methods here, as well.
+Note that this illustrates some of the flexibility of py-smartdc. The 
+``dataset`` parameter happens to be the ``dict`` we got from by querying the 
+CloudAPI, but the ``create_machine`` method extracts the appropriate URN from 
+the ``dict``. More conventionally, the ``package`` parameter is identified by 
+a string, the name of the bundle of machine resources. We upload the 
+previously-saved boot script, and add a tag to the machine, so we can quickly 
+identify test instances.
+
+This method call instantiates a ``smartdc.machine.Machine`` object that has 
+its own methods and properties that allow you to examine data about the remote 
+machine controlled via CloudAPI. Many methods correspond with the HTTP API 
+driving it, but there are additional convenience methods here, as well.
 
 For example, ``poll_while`` and ``poll_until`` block while continually polling 
 the datacenter for the machine's ``.state`` to be updated. Note that if you 
