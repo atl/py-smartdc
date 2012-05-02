@@ -193,7 +193,7 @@ given a common tag.
     east.num_machines(tags={'type':'test'}) == 0
 
 To learn more, you can read the API documentation for both the `DataCenter`_ 
-and `Machine`_ objects.
+and `Machine`_ classes.
 
 .. _ssh: https://github.com/bitprophet/ssh
 .. _Fabric: http://docs.fabfile.org/
