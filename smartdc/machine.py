@@ -417,6 +417,10 @@ class Machine(object):
         
         Replace the existing boot script for the machine with the data in the 
         named file.
+
+        .. Note:: The SMF service that runs the boot script will kill processes
+           that exceed 60 seconds execution time, so this is not necessarily 
+           the best vehicle for long ``pkgin`` installations, for example.
         """
         data = {}
         with open(filename) as f:

@@ -91,8 +91,13 @@ Note that this illustrates some of the flexibility of py-smartdc. The
 CloudAPI, but the ``create_machine`` method extracts the appropriate URN from 
 the ``dict``. More conventionally, the ``package`` parameter is identified by 
 a string, the name of the bundle of machine resources. We upload the 
-previously-saved boot script, and add a tag to the machine, so we can quickly 
+previously-saved ``boot_script``, and add a tag to the machine, so we can quickly 
 identify test instances.
+
+.. Note:: Although boot scripts are tremendously useful, in testing, we've 
+   discovered that the SMF service that runs the boot script will kill processes
+   that exceed 60 seconds execution time, so this is not necessarily 
+   the best vehicle for long ``pkgin`` installations, for example.
 
 This method call instantiates a ``smartdc.machine.Machine`` object that has 
 its own methods and properties that allow you to examine data about the remote 
