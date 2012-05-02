@@ -285,7 +285,7 @@ class DataCenter(object):
         
         Uploads a public key to be added to the account's credentials.
         """
-        data = json.dumps({'name': str(key_id), 'key': str(key)})
+        data = {'name': str(key_id), 'key': str(key)}
         j, _ = self.request('POST', 'keys', data=data)
         return j
     
