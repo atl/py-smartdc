@@ -2,7 +2,8 @@ Python SmartDataCenter
 ======================
 
 Connect with Joyent_'s SmartDataCenter CloudAPI_ via Python, using secure 
-http-signature_ signed requests.
+http-signature_ signed requests. It enables you to programmatically provision
+and otherwise control machines within Joyent_'s public cloud.
 
 This is a third-party effort.
 
