@@ -34,7 +34,7 @@ up.
 Python SmartDataCenter Links
 ----------------------------
 
-* `Python Smart Data Center Tutorial`_ 
+* `Python SmartDataCenter Tutorial`_ 
 * `smartdc in PyPI`_
 * `http_signature in PyPI`_
 * `py-smartdc at GitHub`_
@@ -50,7 +50,7 @@ Python SmartDataCenter Links
 .. _requests: https://github.com/kennethreitz/requests
 .. _PyCrypto: http://pypi.python.org/pypi/pycrypto
 .. _ssh: https://github.com/bitprophet/ssh
-.. _Python Smart Data Center Tutorial: 
+.. _Python SmartDataCenter Tutorial: 
     http://packages.python.org/smartdc/tutorial.html
 .. _smartdc in PyPI: http://pypi.python.org/pypi/smartdc
 .. _http_signature in PyPI: http://pypi.python.org/pypi/http_signature
