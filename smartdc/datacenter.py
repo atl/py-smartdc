@@ -207,15 +207,17 @@ class DataCenter(object):
         request_headers.update(self.default_headers)
         if headers:
             request_headers.update(headers)
+        jdata = None
         if data:
-            data = json.dumps(data)
-            kwargs['data'] = data
+            jdata = json.dumps(data)
         resp = requests.request(method, full_path, auth=self.auth, 
-            headers=request_headers, config=self.config, **kwargs)
+            headers=request_headers, config=self.config, data=jdata,
+            **kwargs)
         if (resp.status_code == 401 and self.auth and 
                 self.auth.signer._agent_key):
             self.auth.signer.swap_keys()
-            return self.request(method, path, headers=headers, **kwargs)
+            return self.request(method, path, headers=headers, data=data,
+                **kwargs)
         if 400 <= resp.status_code < 499:
             if resp.content:
                 print >> sys.stderr, resp.content
