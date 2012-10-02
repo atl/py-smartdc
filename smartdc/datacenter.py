@@ -54,7 +54,7 @@ class DataCenter(object):
     """
     def __init__(self, location=None, key_id=None, secret='~/.ssh/id_rsa', 
                 headers=None, login=None, config=None, known_locations=None,
-                allow_agent=True):
+                allow_agent=False):
         """
         A :py:class:`smartdc.datacenter.DataCenter` object may be instantiated 
         without any parameters, but practically speaking, the `key_id` and 
@@ -81,6 +81,9 @@ class DataCenter(object):
         
         :param known_locations: keys-to-URLs mapping used by `location` 
         :type known_locations: :py:class:`dict`
+        
+        :param allow_agent: whether or not to try ssh-agent
+        :type allow_agent: :py:class:`bool`
         
         The `location` is notionally a hostname, but it may be 
         expressed as an FQDN, one of the keys to the `known_locations` dict, 
