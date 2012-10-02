@@ -27,6 +27,9 @@ Requirements
 * requests_
 * py-http-signature_
 * PyCrypto_ (required by py-http-signature)
+
+Optional:
+
 * ssh_ (used by py-http-signature for its ``ssh-agent`` integration)
 
 We assume that ``json`` is present because requests now requires py2.6 and 

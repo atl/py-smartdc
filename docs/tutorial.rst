@@ -197,10 +197,8 @@ given a common tag.
     
     east.num_machines(tags={'type':'test'}) == 0
 
-To learn more, you can read the API documentation for both the `DataCenter`_ 
-and `Machine`_ classes.
+To learn more, you can read the API documentation for both the :py:class:`smartdc.datacenter.DataCenter`
+and :py:class:`smartdc.machine.Machine` classes.
 
 .. _ssh: https://github.com/bitprophet/ssh
 .. _Fabric: http://docs.fabfile.org/
-.. _DataCenter: http://packages.python.org/smartdc/datacenter.html
-.. _Machine: http://packages.python.org/smartdc/machine.html
