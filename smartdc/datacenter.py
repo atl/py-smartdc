@@ -173,13 +173,16 @@ class DataCenter(object):
         else:
             return 'https://' + self.location + API_HOST_SUFFIX
     
-    def authenticate(self, key_id=None, secret=None, allow_agent=True):
+    def authenticate(self, key_id=None, secret=None, allow_agent=False):
         """
         :param key_id: SmartDC identifier for the ssh key
         :type key_id: :py:class:`basestring`
         
         :param secret: path to private rsa key
         :type secret: :py:class:`basestring`
+        
+        :param allow_agent: whether or not to try ssh-agent
+        :type allow_agent: :py:class:`bool`
         
         If no `key_id` or `secret` were entered on initialization, or there is
         a need to change the existing authentication credentials, one may 
