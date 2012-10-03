@@ -53,7 +53,7 @@ Python SmartDataCenter Links
     https://github.com/joyent/node-http-signature/blob/master/http_signing.md
 .. _requests: http://pypi.python.org/pypi/requests
 .. _PyCrypto: http://pypi.python.org/pypi/pycrypto
-.. _ssh: https://github.com/bitprophet/ssh
+.. _ssh: http://pypi.python.org/pypi/ssh
 .. _Python SmartDataCenter Tutorial: 
     http://packages.python.org/smartdc/tutorial.html
 .. _smartdc in PyPI: http://pypi.python.org/pypi/smartdc
