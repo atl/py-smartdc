@@ -9,7 +9,7 @@ This is a third-party effort.
 
 This module currently supports:
 
-* Secure connections (via http_signature_ and ssh-agent, when available)
+* Secure connections (via http_signature_ and optionally, ssh-agent)
 * Key management
 * Browsing and access of datacenters, datasets (OS distributions/VM bundles), 
   and packages (machine sizes and resources)
