@@ -9,7 +9,7 @@ This is a third-party effort.
 
 This module currently supports:
 
-* Secure connections (via py-http-signature_ and ssh-agent, when available)
+* Secure connections (via http_signature_ and ssh-agent, when available)
 * Key management
 * Browsing and access of datacenters, datasets (OS distributions/VM bundles), 
   and packages (machine sizes and resources)
@@ -25,12 +25,12 @@ Requirements
 ------------
 
 * requests_
-* py-http-signature_
-* PyCrypto_ (required by py-http-signature)
+* http_signature_
+* PyCrypto_ (required by http_signature)
 
 Optional:
 
-* ssh_ (used by py-http-signature for its ``ssh-agent`` integration)
+* ssh_ (used by http_signature for its ``ssh-agent`` integration)
 
 We assume that ``json`` is present because requests now requires py2.6 and 
 up.
@@ -51,14 +51,14 @@ Python SmartDataCenter Links
 .. _Joyent CloudAPI Documentation: CloudAPI_
 .. _http-signature: 
     https://github.com/joyent/node-http-signature/blob/master/http_signing.md
-.. _requests: https://github.com/kennethreitz/requests
+.. _requests: http://pypi.python.org/pypi/requests
 .. _PyCrypto: http://pypi.python.org/pypi/pycrypto
 .. _ssh: https://github.com/bitprophet/ssh
 .. _Python SmartDataCenter Tutorial: 
     http://packages.python.org/smartdc/tutorial.html
 .. _smartdc in PyPI: http://pypi.python.org/pypi/smartdc
 .. _http_signature in PyPI: http://pypi.python.org/pypi/http_signature
-.. _py-http-signature: `http_signature in PyPI`_
+.. _http_signature: `http_signature in PyPI`_
 .. _py-http-signature at GitHub: https://github.com/atl/py-http-signature
 .. _py-smartdc at GitHub: https://github.com/atl/py-smartdc
 .. _py-smartdc Documentation: http://packages.python.org/smartdc/
