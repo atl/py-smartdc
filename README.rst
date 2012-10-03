@@ -30,7 +30,8 @@ Requirements
 
 Optional:
 
-* ssh_ (used by http_signature for its ``ssh-agent`` integration)
+* ssh_  or paramiko_ (post-1.8.0) 
+  (used by http_signature for its ``ssh-agent`` integration)
 
 We assume that ``json`` is present because requests now requires py2.6 and 
 up.
@@ -54,6 +55,7 @@ Python SmartDataCenter Links
 .. _requests: http://pypi.python.org/pypi/requests
 .. _PyCrypto: http://pypi.python.org/pypi/pycrypto
 .. _ssh: http://pypi.python.org/pypi/ssh
+.. _paramiko: http://pypi.python.org/pypi/paramiko
 .. _Python SmartDataCenter Tutorial: 
     http://packages.python.org/smartdc/tutorial.html
 .. _smartdc in PyPI: http://pypi.python.org/pypi/smartdc
