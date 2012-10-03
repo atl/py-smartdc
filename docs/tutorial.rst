@@ -15,14 +15,15 @@ effectively our persistent connection object::
     sdc = DataCenter(location='us-sw-1', key_id='/test/keys/test_key', 
                       secret='~/.ssh/id_rsa', config=DEBUG_CONFIG)
 
-The ``key_id`` is the only parameter that requires user input. It has the form 
-``/<username>/keys/<key_name>`` with the ``key_name`` being the label attached 
-to the Public SSH key uploaded to your Smart Data Center 
-(https://my.joyentcloud.com) account (and corresponding to the private key 
-identified in the ``secret`` parameter). By default, ``py-smartdc`` looks for 
-an ``ssh-agent``, and then your private ssh key at the above-listed path. The 
-``DEBUG_CONFIG`` echoes each CloudAPI connection to ``stderr`` to aid in 
-debugging. 
+The ``key_id`` is the only parameter that requires user input. It has the form
+``/<username>/keys/<key_name>`` with the ``key_name`` being the label attached
+to the Public SSH key uploaded to your Smart Data Center
+(https://my.joyentcloud.com) account (and corresponding to the private key
+identified in the ``secret`` parameter). SmartDC looks for an
+``ssh-agent`` when the ``allow_agent`` parameter is set to ``True``. Default
+behavior is to seek a private ssh key at the path identified by ``secret``.
+The ``DEBUG_CONFIG`` echoes each CloudAPI connection to ``stderr`` to aid in
+debugging.
 
 Once connected to a datacenter, you can look at all sorts of account 
 information, such as listing your uploaded public SSH keys::
@@ -30,7 +31,7 @@ information, such as listing your uploaded public SSH keys::
     sdc.keys()
     
 Given one datacenter, you can connect to another with your existing 
-credentials and preferences::
+credentials and configuration::
 
     east = sdc.datacenter('us-east-1')
 
@@ -76,11 +77,11 @@ expression::
 Instantiating machines
 ----------------------
 
-Sometimes we can create a smartmachine with no arguments at all: a default 
-dataset and a default package are usually defined by the datacenter, and a 
-unique name will always be defined if you omit one. However, besides valuing 
-convenience and terseness, this python package is also about exercising fine 
-control::
+In some situations we can create a smartmachine with no arguments at all: a
+default dataset and a default package are sometimes defined by the datacenter,
+and a unique name will always be defined if you omit one. However, besides
+valuing convenience and terseness, this python package is also about
+exercising fine control::
 
     test_machine = east.create_machine(name='test-machine', dataset=latest64,
                     package='Small 1GB', boot_script='./test-script.sh', 

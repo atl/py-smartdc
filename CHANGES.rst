@@ -1,6 +1,10 @@
 Changes
 -------
 
+0.1.10 ()
+~~~~~~~~~~~~~~~~~~~
+* Change documentation to account for underlying shift in py-http-signature accommodating both (new) paramiko and ssh
+
 0.1.9 (2012-10-02)
 ~~~~~~~~~~~~~~~~~~
 * Bug fix: POSTs including data would get mangled while looking for a correct ssh-agent key (thanks, @thekad)
