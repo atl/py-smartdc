@@ -64,6 +64,7 @@ Python SmartDataCenter Links
 .. _py-http-signature at GitHub: https://github.com/atl/py-http-signature
 .. _py-smartdc at GitHub: https://github.com/atl/py-smartdc
 .. _py-smartdc Documentation: http://packages.python.org/smartdc/
+.. _Telefónica's InstantServers: http://cloud.telefonica.com/instantservers/
 
 Installation
 ------------
@@ -97,6 +98,15 @@ Quickstart
     sm.poll_until('stopped')
     
     sm.delete()
+
+Connecting with `Telefónica's InstantServers`_::
+
+    from smartdc import DataCenter, TELEFONICA_LOCATIONS
+    
+    mad = DataCenter('Madrid', known_locations=TELEFONICA_LOCATIONS,
+                  key_id='/test/keys/test_key', verify=False)
+    
+    mad.default_package()
 
 Why?
 ----
