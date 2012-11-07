@@ -9,7 +9,7 @@ from http_signature.requests_auth import HTTPSignatureAuth
 from .machine import Machine
 
 __all__ = ['DataCenter', 'DEBUG_CONFIG', 'KNOWN_LOCATIONS', 
-            'DEFAULT_LOCATION']
+            'TELEFONICA_LOCATIONS', 'DEFAULT_LOCATION']
 
 API_HOST_SUFFIX = '.api.joyentcloud.com'
 API_VERSION = '~6.5'
@@ -367,6 +367,8 @@ class DataCenter(object):
         """
         # The base form of this, as below, simply sets up a redirect. 
         # j, _ = self.request('GET', 'datacenters/' + str(name))
+        if name not in self.known_locations and '.' not in name:
+            self.datacenters()
         dc = DataCenter(location=name, headers=self.default_headers, 
                 login=self.login, config=self.config, 
                 verify=self.verify, known_locations=self.known_locations)
