@@ -21,6 +21,13 @@ KNOWN_LOCATIONS = {
     u'eu-ams-1':  u'https://eu-ams-1.api.joyentcloud.com',
 }
 
+TELEFONICA_LOCATIONS = {
+    u'London': u'https://84.16.29.10', 
+    u'eu-lon-1': u'https://84.16.29.10', 
+    u'Madrid': u'https://80.58.199.6',
+    u'eu-mad-1': u'https://80.58.199.6',
+}
+
 DEFAULT_LOCATION = 'us-west-1'
 
 DEFAULT_HEADERS = {
@@ -54,7 +61,7 @@ class DataCenter(object):
     """
     def __init__(self, location=None, key_id=None, secret='~/.ssh/id_rsa', 
                 headers=None, login=None, config=None, known_locations=None,
-                allow_agent=False):
+                allow_agent=False, verify=True):
         """
         A :py:class:`smartdc.datacenter.DataCenter` object may be instantiated 
         without any parameters, but practically speaking, the `key_id` and 
@@ -85,6 +92,9 @@ class DataCenter(object):
         :param allow_agent: whether or not to try ssh-agent
         :type allow_agent: :py:class:`bool`
         
+        :param verify: whether or not to verify server SSL certificates
+        :type verify: :py:class:`bool`
+        
         The `location` is notionally a hostname, but it may be 
         expressed as an FQDN, one of the keys to the `known_locations` dict, 
         or, as a fallback, a bare hostname as prefix to the API_HOST_SUFFIX.
@@ -104,6 +114,7 @@ class DataCenter(object):
         self.location = location or DEFAULT_LOCATION
         self.known_locations = known_locations or KNOWN_LOCATIONS
         self.config = config or {}
+        self.verify = verify
         if key_id and secret:
             self.auth = HTTPSignatureAuth(key_id=key_id, secret=secret,
                 allow_agent=allow_agent)
@@ -218,7 +229,7 @@ class DataCenter(object):
             jdata = json.dumps(data)
         resp = requests.request(method, full_path, auth=self.auth, 
             headers=request_headers, config=self.config, data=jdata,
-            **kwargs)
+            verify=self.verify, **kwargs)
         if (resp.status_code == 401 and self.auth and 
                 self.auth.signer._agent_key):
             self.auth.signer.swap_keys()
@@ -246,7 +257,7 @@ class DataCenter(object):
             and URL templates
         :rtype: :py:class:`dict`
         """
-        resp = requests.request('GET', self.base_url)
+        resp = requests.request('GET', self.base_url, verify=self.verify)
         if 400 <= resp.status_code < 499:
             resp.raise_for_status()
         if resp.content:
@@ -357,7 +368,8 @@ class DataCenter(object):
         # The base form of this, as below, simply sets up a redirect. 
         # j, _ = self.request('GET', 'datacenters/' + str(name))
         dc = DataCenter(location=name, headers=self.default_headers, 
-                login=self.login, config=self.config)
+                login=self.login, config=self.config, 
+                verify=self.verify, known_locations=self.known_locations)
         dc.auth = self.auth
         return dc
     

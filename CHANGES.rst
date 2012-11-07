@@ -1,9 +1,11 @@
 Changes
 -------
 
-0.1.10 ()
+0.1.10 (2012-11-07)
 ~~~~~~~~~~~~~~~~~~~
 * Change documentation to account for underlying shift in py-http-signature accommodating both (new) paramiko and ssh
+* Add "verify" option to DataCenter to allow for opt-out of SSL Certificate verification (necessitated by Telefónica's initial release of InstantServers)
+* Save more state from current DataCenter when transferring to another one
 
 0.1.9 (2012-10-02)
 ~~~~~~~~~~~~~~~~~~
