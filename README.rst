@@ -76,7 +76,9 @@ Installation
 Quickstart
 ----------
 
-::
+This requires a Joyent Public Cloud account with valid payment information and
+at least one SSH key uploaded. The example as presented should cost a maximum
+of 0.03USD::
 
     from smartdc import DataCenter
     
@@ -84,8 +86,8 @@ Quickstart
     
     sdc.datasets()
     
-    sm = sdc.create_machine(name='test', dataset='sdc:sdc:smartosplus:',
-          package='Small 1GB')
+    sm = sdc.create_machine(name='test', dataset='sdc:sdc:standard:',
+          package='Extra Small 512 MB')
     
     sm.poll_until('running')
     
