@@ -1,5 +1,6 @@
 import time
 from datetime import datetime
+import uuid
 
 __all__ = ['Machine', 'Snapshot']
 
@@ -124,6 +125,9 @@ class Machine(object):
     
     def __ne__(self, other):
         return not self.__eq__(other)
+    
+    def __hash__(self):
+        return uuid.UUID(self.id).int
     
     def _save(self, data):
         """
