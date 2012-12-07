@@ -6,6 +6,7 @@ Changes
 * Minor update to the README quickstart
 * Machines are hashable based on their UUIDs
 * Pre-programmed Telefónica locations are based on FQDNs
+* KNOWN ISSUE: DataCenter equality not guaranteed with Telefónica servers (due to how they are identified by Telefónica)
 
 0.1.10 (2012-11-07)
 ~~~~~~~~~~~~~~~~~~~
