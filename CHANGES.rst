@@ -4,6 +4,8 @@ Changes
 0.1.11 ()
 ~~~~~~~~~~~~~~~~~~~
 * Minor update to the README quickstart
+* Machines are hashable based on their UUIDs
+* Pre-programmed Telefónica locations are based on FQDNs
 
 0.1.10 (2012-11-07)
 ~~~~~~~~~~~~~~~~~~~
