@@ -1,7 +1,7 @@
 Changes
 -------
 
-0.1.11 ()
+0.1.11 (2012-12-07)
 ~~~~~~~~~~~~~~~~~~~
 * Minor update to the README quickstart
 * Machines are hashable based on their UUIDs
