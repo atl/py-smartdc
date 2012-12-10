@@ -703,6 +703,7 @@ class DataCenter(object):
         """
         params = {}
         if name:
+            assert re.match(r'[a-zA-Z0-9]([a-zA-Z0-9\-\.]*[a-zA-Z0-9])?$', name), "Illegal name"
             params['name'] = name
         if package:
             if isinstance(package, dict):
