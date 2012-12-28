@@ -22,10 +22,10 @@ KNOWN_LOCATIONS = {
 }
 
 TELEFONICA_LOCATIONS = {
-    u'London': u'https://eu-lon-1.api.instantservers.telefonica.com', 
-    u'eu-lon-1': u'https://eu-lon-1.api.instantservers.telefonica.com', 
-    u'Madrid': u'https://eu-mad-1.api.instantservers.telefonica.com',
-    u'eu-mad-1': u'https://eu-mad-1.api.instantservers.telefonica.com',
+    u'London': u'https://api-eu-lon-1.instantservers.telefonica.com', 
+    u'eu-lon-1': u'https://api-eu-lon-1.instantservers.telefonica.com', 
+    u'Madrid': u'https://api-eu-mad-1.instantservers.telefonica.com',
+    u'eu-mad-1': u'https://api-eu-mad-1.instantservers.telefonica.com',
 }
 
 DEFAULT_LOCATION = 'us-west-1'
