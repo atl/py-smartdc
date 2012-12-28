@@ -82,7 +82,7 @@ of 0.03USD::
 
     from smartdc import DataCenter
     
-    sdc = DataCenter(location='us-sw-1', key_id='/test/keys/test_key')
+    sdc = DataCenter(location='us-sw-1', key_id='/accountname/keys/keyname')
     
     sdc.datasets()
     
@@ -105,8 +105,9 @@ Connecting with `Telefónica's InstantServers`_::
 
     from smartdc import DataCenter, TELEFONICA_LOCATIONS
     
-    mad = DataCenter('Madrid', known_locations=TELEFONICA_LOCATIONS,
-                  key_id='/test/keys/test_key', verify=False)
+    mad = DataCenter(location='eu-mad-1', 
+                  known_locations=TELEFONICA_LOCATIONS,
+                  key_id='/accountname/keys/keyname')
     
     mad.default_package()
 
