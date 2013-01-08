@@ -4,6 +4,8 @@ Changes
 0.1.12 ()
 ~~~~~~~~~~~~~~~~~~~
 * Telefónica has updated the endpoints for its known locations. These locations are capable of SSL-verifiable connections.
+* Move print statements in library to print functions (still pending issue with versioneer)
+* Requests 1.0 release removed "config" from request's kwargs, so created a workaround that works in old and new versions
 
 0.1.11 (2012-12-07)
 ~~~~~~~~~~~~~~~~~~~
