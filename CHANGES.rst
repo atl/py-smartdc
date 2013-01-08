@@ -5,7 +5,8 @@ Changes
 ~~~~~~~~~~~~~~~~~~~
 * Telefónica has updated the endpoints for its known locations. These locations are capable of SSL-verifiable connections.
 * Move print statements in library to print functions (still pending issue with versioneer)
-* Requests 1.0 release removed "config" from request's kwargs, so created a workaround that works in old and new versions
+* Requests 1.0 release removed `config` from request's keyword arguments, so created a workaround that works in old and new versions
+* `verbose` (bool) is now the preferred keyword argument in DataCenter initialization since we no longer piggy-back on requests config. `config` issues a warning.
 
 0.1.11 (2012-12-07)
 ~~~~~~~~~~~~~~~~~~~

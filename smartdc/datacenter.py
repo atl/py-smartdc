@@ -4,6 +4,8 @@ import json
 from operator import itemgetter
 import re
 from datetime import datetime
+from exceptions import FutureWarning
+from warnings import warn
 
 import requests
 from http_signature.requests_auth import HTTPSignatureAuth
@@ -63,7 +65,7 @@ class DataCenter(object):
     """
     def __init__(self, location=None, key_id=None, secret='~/.ssh/id_rsa', 
                 headers=None, login=None, config=None, known_locations=None,
-                allow_agent=False, verify=True):
+                allow_agent=False, verify=True, verbose=None):
         """
         A :py:class:`smartdc.datacenter.DataCenter` object may be instantiated 
         without any parameters, but practically speaking, the `key_id` and 
@@ -85,7 +87,7 @@ class DataCenter(object):
         :param login: user path in SmartDC
         :type login: :py:class:`basestring`
         
-        :param config: Requests-style configuration
+        :param config: Requests-style configuration [deprecated]
         :type config: :py:class:`dict`
         
         :param known_locations: keys-to-URLs mapping used by `location` 
@@ -96,6 +98,9 @@ class DataCenter(object):
         
         :param verify: whether or not to verify server SSL certificates
         :type verify: :py:class:`bool`
+        
+        :param verbose: whether or not to print request URLs to stderr, overrides config
+        :type verbose: :py:class:`bool`
         
         The `location` is notionally a hostname, but it may be 
         expressed as an FQDN, one of the keys to the `known_locations` dict, 
@@ -115,7 +120,12 @@ class DataCenter(object):
         """
         self.location = location or DEFAULT_LOCATION
         self.known_locations = known_locations or KNOWN_LOCATIONS
-        self.config = config or {}
+        if verbose is None and config and config.get('verbose'):
+            self.verbose = config.get('verbose')
+            warn("DataCenter: config= will be eliminated in "
+                "favor of verbose=", FutureWarning, stacklevel=2)
+        else:
+            self.verbose = verbose and sys.stderr
         self.verify = verify
         if key_id and secret:
             self.auth = HTTPSignatureAuth(key_id=key_id, secret=secret,
@@ -229,10 +239,10 @@ class DataCenter(object):
         jdata = None
         if data:
             jdata = json.dumps(data)
-        if self.config and self.config.get('verbose'):
+        if self.verbose:
             print("%s\t%s\t%s" % 
                 (datetime.now().isoformat(), method, full_path), 
-                file=self.config.get('verbose'))
+                file=self.verbose)
         resp = requests.request(method, full_path, auth=self.auth, 
             headers=request_headers, data=jdata,
             verify=self.verify, **kwargs)
@@ -263,10 +273,10 @@ class DataCenter(object):
             and URL templates
         :rtype: :py:class:`dict`
         """
-        if self.config and self.config.get('verbose'):
+        if self.verbose:
             print("%s\t%s\t%s" % 
                 (datetime.now().isoformat(), 'GET', self.base_url), 
-                file=self.config.get('verbose'))
+                file=self.verbose)
         resp = requests.request('GET', self.base_url, verify=self.verify)
         if 400 <= resp.status_code < 499:
             resp.raise_for_status()
@@ -380,7 +390,7 @@ class DataCenter(object):
         if name not in self.known_locations and '.' not in name:
             self.datacenters()
         dc = DataCenter(location=name, headers=self.default_headers, 
-                login=self.login, config=self.config, 
+                login=self.login, verbose=self.verbose, 
                 verify=self.verify, known_locations=self.known_locations)
         dc.auth = self.auth
         return dc
