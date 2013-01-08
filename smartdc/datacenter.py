@@ -1,8 +1,9 @@
+from __future__ import print_function
 import sys
 import json
 from operator import itemgetter
 import re
-from __future__ import print_function
+from datetime import datetime
 
 import requests
 from http_signature.requests_auth import HTTPSignatureAuth
