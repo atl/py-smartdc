@@ -2,6 +2,7 @@ import sys
 import json
 from operator import itemgetter
 import re
+from __future__ import print_function
 
 import requests
 from http_signature.requests_auth import HTTPSignatureAuth
@@ -237,7 +238,7 @@ class DataCenter(object):
                 **kwargs)
         if 400 <= resp.status_code < 499:
             if resp.content:
-                print >> sys.stderr, resp.content
+                print(resp.content, file=sys.stderr)
             resp.raise_for_status()
         if resp.content:
             if resp.headers['content-type'] == 'application/json':
@@ -724,7 +725,7 @@ class DataCenter(object):
                 params['metadata.user-script'] = f.read()
         j, r = self.request('POST', 'machines', data=params)
         if r.status_code >= 400:
-            print >> sys.stderr, j
+            print(j, file=sys.stderr)
             r.raise_for_status()
         return Machine(datacenter=self, data=j)
     
