@@ -1,7 +1,7 @@
 Changes
 -------
 
-0.1.12 ()
+0.1.12 (2013-01-08)
 ~~~~~~~~~~~~~~~~~~~
 * Telefónica has updated the endpoints for its known locations. These locations are capable of SSL-verifiable connections.
 * Move print statements in library to print functions (still pending issue with versioneer)
