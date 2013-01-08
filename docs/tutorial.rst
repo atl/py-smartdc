@@ -10,19 +10,19 @@ Datacenters and setting up a connection
 We begin by importing the library and initializing the DataCenter, which is 
 effectively our persistent connection object::
 
-    from smartdc import DataCenter, DEBUG_CONFIG
+    from smartdc import DataCenter
     
     sdc = DataCenter(location='us-sw-1', key_id='/test/keys/test_key', 
-                      secret='~/.ssh/id_rsa', config=DEBUG_CONFIG)
+                      secret='~/.ssh/id_rsa', verbose=True)
 
 The ``key_id`` is the only parameter that requires user input. It has the form
 ``/<username>/keys/<key_name>`` with the ``key_name`` being the label attached
 to the Public SSH key uploaded to your Smart Data Center
 (https://my.joyentcloud.com) account (and corresponding to the private key
-identified in the ``secret`` parameter). SmartDC looks for an
-``ssh-agent`` when the ``allow_agent`` parameter is set to ``True``. Default
-behavior is to seek a private ssh key at the path identified by ``secret``.
-The ``DEBUG_CONFIG`` echoes each CloudAPI connection to ``stderr`` to aid in
+identified in the ``secret`` parameter). SmartDC looks for an ``ssh-agent``
+when the ``allow_agent`` parameter is set to ``True``. Default behavior is to
+seek a private ssh key at the path identified by ``secret``. ``verbose=True``
+means SmartDC echoes each CloudAPI connection to ``stderr`` to aid in
 debugging.
 
 Once connected to a datacenter, you can look at all sorts of account 
@@ -59,7 +59,7 @@ an ambiguous URN to the most recent one. Handy.
 
 ::
 
-    latest64 = east.dataset('sdc:sdc:smartos64:')
+    latest64 = east.dataset('sdc:sdc:base64:')
 
 ``py-smartdc`` defines a few convenience functions beyond the ones offering 
 raw results directly from the CloudAPI, such as filtering through available 
@@ -70,9 +70,9 @@ packages or datasets to return the default assigned by the datacenter::
 ...or locally filtering for packages or datasets that match a regular 
 expression::
 
-    sdc.packages('high[- ]cpu')
+    sdc.packages('^X{1,2}L')
     
-    east.datasets('smartos(64)?:')
+    east.datasets('base(64)?:')
 
 Instantiating machines
 ----------------------
@@ -95,10 +95,10 @@ a string, the name of the bundle of machine resources. We upload the
 previously-saved ``boot_script``, and add a tag to the machine, so we can quickly 
 identify test instances.
 
-.. Note:: Although boot scripts are tremendously useful, in testing, we've 
-   discovered that the SMF service that runs the boot script will kill processes
-   that exceed 60 seconds execution time, so this is not necessarily 
-   the best vehicle for long ``pkgin`` installations, for example.
+.. Note:: Although boot scripts are tremendously useful, the SMF service that
+   runs the boot script will kill processes that exceed 60 seconds execution
+   time, so this is not necessarily the best vehicle for long ``pkgin``
+   installations, for example.
 
 This method call instantiates a ``smartdc.machine.Machine`` object that has 
 its own methods and properties that allow you to examine data about the remote 
