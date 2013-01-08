@@ -228,8 +228,12 @@ class DataCenter(object):
         jdata = None
         if data:
             jdata = json.dumps(data)
+        if self.config and self.config.get('verbose'):
+            print("%s\t%s\t%s" % 
+                (datetime.now().isoformat(), method, full_path), 
+                file=self.config.get('verbose'))
         resp = requests.request(method, full_path, auth=self.auth, 
-            headers=request_headers, config=self.config, data=jdata,
+            headers=request_headers, data=jdata,
             verify=self.verify, **kwargs)
         if (resp.status_code == 401 and self.auth and 
                 self.auth.signer._agent_key):
@@ -258,6 +262,10 @@ class DataCenter(object):
             and URL templates
         :rtype: :py:class:`dict`
         """
+        if self.config and self.config.get('verbose'):
+            print("%s\t%s\t%s" % 
+                (datetime.now().isoformat(), 'GET', self.base_url), 
+                file=self.config.get('verbose'))
         resp = requests.request('GET', self.base_url, verify=self.verify)
         if 400 <= resp.status_code < 499:
             resp.raise_for_status()
