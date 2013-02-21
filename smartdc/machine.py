@@ -6,8 +6,11 @@ __all__ = ['Machine', 'Snapshot']
 
 def priv(x): 
     """
-    Incomplete heuristic to find an IP on a private network
+    Quick and dirty method to find an IP on a private network given a correctly
+    formatted IPv4 quad.
     """
+    if x.startswith(u'172.'):
+        return 16 <= int(x.split(u'.')[1]) < 32
     return x.startswith((u'192.168.', u'10.', u'172.'))
 
 
@@ -20,9 +23,9 @@ def pub(x):
 
 def dt_time(x):
     """
-    Somewhat cheap hack to parse ISO8601 as returned from API
+    Cheap hack to parse ISO8601 as returned from API
     """
-    return datetime.strptime(x.rpartition('+')[0], "%Y-%m-%dT%H:%M:%S")
+    return datetime.strptime(x[:19], "%Y-%m-%dT%H:%M:%S")
 
 
 def timestamp(x): 
@@ -146,7 +149,7 @@ class Machine(object):
         self._credentials.update(self.metadata.pop('credentials', {}))
         self.boot_script = self.metadata.pop('user-script', None)
         self.created = dt_time(data.get('created'))
-        self.updated = dt_time(data.get('updated'))
+        self.updated = dt_time(data.get('updated', data.get('created')))
     
     @property
     def path(self):

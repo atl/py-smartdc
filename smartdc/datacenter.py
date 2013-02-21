@@ -6,6 +6,7 @@ import re
 from datetime import datetime
 from exceptions import FutureWarning
 from warnings import warn
+from urlparse import urlparse
 
 import requests
 from http_signature.requests_auth import HTTPSignatureAuth
@@ -191,6 +192,9 @@ class DataCenter(object):
         """Protocol + hostname"""
         if self.location in self.known_locations:
             return self.known_locations[self.location]
+        loc = urlparse(self.location)
+        if loc.scheme.startswith('http'):
+            return self.location
         elif '.' in self.location or self.location == 'localhost':
             return 'https://' + self.location
         else:

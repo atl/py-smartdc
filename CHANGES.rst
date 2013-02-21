@@ -1,6 +1,10 @@
 Changes
 -------
 
+0.1.13 (2013-0n-mm)
+~~~~~~~~~~~~~~~~~~~
+* Changes to allow for connections to vmwebadm hubs
+
 0.1.12 (2013-01-08)
 ~~~~~~~~~~~~~~~~~~~
 * Telefónica has updated the endpoints for its known locations. These locations are capable of SSL-verifiable connections.
