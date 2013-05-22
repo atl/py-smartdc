@@ -142,7 +142,7 @@ class Machine(object):
         self.dataset = data.get('dataset')
         self.memory = data.get('memory')
         self.disk = data.get('disk')
-        self.ips = data.get('ips', [])
+        self._ips = data.get('ips', [])
         self.metadata = data.get('metadata', {})
         if not hasattr(self, '_credentials'):
             self._credentials = {}
@@ -174,6 +174,15 @@ class Machine(object):
         private IPs.
         """
         return filter(priv, self.ips)
+    
+    @property
+    def ips(self):
+        """
+        If IPs are not immediately available, then re-GET the resource.
+        """
+        if not self._ips:
+            self.refresh()
+        return self._ips
     
     @classmethod
     def create_in_datacenter(cls, datacenter, **kwargs):
