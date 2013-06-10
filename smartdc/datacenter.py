@@ -6,7 +6,6 @@ import re
 from datetime import datetime
 from exceptions import FutureWarning
 from warnings import warn
-from urlparse import urlparse
 
 import requests
 from http_signature.requests_auth import HTTPSignatureAuth
@@ -17,7 +16,8 @@ __all__ = ['DataCenter', 'DEBUG_CONFIG', 'KNOWN_LOCATIONS',
             'TELEFONICA_LOCATIONS', 'DEFAULT_LOCATION']
 
 API_HOST_SUFFIX = '.api.joyentcloud.com'
-API_VERSION = '~6.5'
+#API_VERSION = '~6.5'
+API_VERSION = '~7.0'
 
 KNOWN_LOCATIONS = {
     u'us-east-1': u'https://us-east-1.api.joyentcloud.com',
@@ -192,9 +192,6 @@ class DataCenter(object):
         """Protocol + hostname"""
         if self.location in self.known_locations:
             return self.known_locations[self.location]
-        loc = urlparse(self.location)
-        if loc.scheme.startswith('http'):
-            return self.location
         elif '.' in self.location or self.location == 'localhost':
             return 'https://' + self.location
         else:
@@ -423,7 +420,7 @@ class DataCenter(object):
             return list(search_dicts(j, search, fields))
         else:
             return j
-    
+
     def default_dataset(self):
         """
         ::
@@ -462,7 +459,7 @@ class DataCenter(object):
             dataset_id = dataset_id.get('urn', dataset_id['id'])
         j, _ = self.request('GET', 'datasets/' + str(dataset_id))
         return j
-    
+
     def packages(self, search=None, fields=('name',)):
         """
         ::
@@ -771,4 +768,52 @@ class DataCenter(object):
         return Machine(datacenter=self, machine_id=machine_id, 
                 credentials=credentials)
     
+    def networks(self, search=None, fields=('name,')):
+        """
+        ::
 
+            GET /:login/networks
+
+        :param search: optionally filter (locally) with a regular expression
+            search on the listed fields
+        :type search: :py:class:`basestring` that compiles as a regular
+            expression
+
+        :param fields: filter on the listed fields (defaulting to
+            ``name``)
+        :type fields: :py:class:`list` of :py:class:`basestring`\s
+
+        :Returns: network available in this datacenter
+        :rtype: :py:class:`list` of :py:class:`dict`\s
+        """
+
+        j, _ = self.request('GET', 'networks')
+        if search:
+            return list(search_dicts(j, search, fields))
+        else:
+            return j
+
+    def images(self, search=None, fields=('name,')):
+        """
+        ::
+
+            GET /:login/images
+
+        :param search: optionally filter (locally) with a regular expression
+            search on the listed fields
+        :type search: :py:class:`basestring` that compiles as a regular
+            expression
+
+        :param fields: filter on the listed fields (defaulting to
+            ``name``)
+        :type fields: :py:class:`list` of :py:class:`basestring`\s
+
+        :Returns: network available in this datacenter
+        :rtype: :py:class:`list` of :py:class:`dict`\s
+        """
+
+        j, _ = self.request('GET', 'images')
+        if search:
+            return list(search_dicts(j, search, fields))
+        else:
+            return j
