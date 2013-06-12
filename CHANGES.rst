@@ -1,6 +1,12 @@
 Changes
 -------
 
+0.1.14 (2013-0n-mm)
+~~~~~~~~~~~~~~~~~~~
+* This will be used with the SmartDC API Version 7.0
+* Added list_networks, list_images methods
+* create_machine() now accepts a network parameter
+
 0.1.13 (2013-0n-mm)
 ~~~~~~~~~~~~~~~~~~~
 * Changes to allow for connections to vmwebadm hubs

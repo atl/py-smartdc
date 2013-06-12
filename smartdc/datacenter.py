@@ -16,7 +16,6 @@ __all__ = ['DataCenter', 'DEBUG_CONFIG', 'KNOWN_LOCATIONS',
             'TELEFONICA_LOCATIONS', 'DEFAULT_LOCATION']
 
 API_HOST_SUFFIX = '.api.joyentcloud.com'
-#API_VERSION = '~6.5'
 API_VERSION = '~7.0'
 
 KNOWN_LOCATIONS = {
@@ -681,7 +680,8 @@ class DataCenter(object):
         return [Machine(datacenter=self, data=m) for m in machines]
     
     def create_machine(self, name=None, package=None, dataset=None,
-            metadata=None, tags=None, boot_script=None, credentials=False):
+            metadata=None, tags=None, boot_script=None, credentials=False,
+            networks=None):
         """
         ::
         
@@ -710,6 +710,9 @@ class DataCenter(object):
         :param tags: keys & values with arbitrary supplementary 
             identifying information for filtering when querying for machines
         :type tags: :py:class:`dict`
+
+        :param networks: list of networks where this machine will belong to
+        :type networks: :py:class:`list`
         
         :param boot_script: path to a file to upload for execution on boot
         :type boot_script: :py:class:`basestring` as file path
@@ -743,6 +746,9 @@ class DataCenter(object):
         if boot_script:
             with open(boot_script) as f:
                 params['metadata.user-script'] = f.read()
+        if networks:
+            if isinstance(networks, list):
+                params['networks'] = networks
         j, r = self.request('POST', 'machines', data=params)
         if r.status_code >= 400:
             print(j, file=sys.stderr)
