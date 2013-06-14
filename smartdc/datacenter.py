@@ -6,7 +6,6 @@ import re
 from datetime import datetime
 from exceptions import FutureWarning
 from warnings import warn
-from urlparse import urlparse
 
 import requests
 from http_signature.requests_auth import HTTPSignatureAuth
@@ -196,9 +195,6 @@ class DataCenter(object):
         """Protocol + hostname"""
         if self.location in self.known_locations:
             return self.known_locations[self.location]
-        loc = urlparse(self.location)
-        if loc.scheme.startswith('http'):
-            return self.location
         elif '.' in self.location or self.location == 'localhost':
             return 'https://' + self.location
         else:
@@ -427,7 +423,7 @@ class DataCenter(object):
             return list(search_dicts(j, search, fields))
         else:
             return j
-    
+
     def default_dataset(self):
         """
         ::
@@ -466,7 +462,7 @@ class DataCenter(object):
             dataset_id = dataset_id.get('urn', dataset_id['id'])
         j, _ = self.request('GET', 'datasets/' + str(dataset_id))
         return j
-    
+
     def packages(self, search=None, fields=('name',)):
         """
         ::
@@ -688,7 +684,8 @@ class DataCenter(object):
         return [Machine(datacenter=self, data=m) for m in machines]
     
     def create_machine(self, name=None, package=None, dataset=None,
-            metadata=None, tags=None, boot_script=None, credentials=False):
+            metadata=None, tags=None, boot_script=None, credentials=False,
+            networks=None):
         """
         ::
         
@@ -717,6 +714,9 @@ class DataCenter(object):
         :param tags: keys & values with arbitrary supplementary 
             identifying information for filtering when querying for machines
         :type tags: :py:class:`dict`
+
+        :param networks: list of networks where this machine will belong to
+        :type networks: :py:class:`list`
         
         :param boot_script: path to a file to upload for execution on boot
         :type boot_script: :py:class:`basestring` as file path
@@ -750,6 +750,9 @@ class DataCenter(object):
         if boot_script:
             with open(boot_script) as f:
                 params['metadata.user-script'] = f.read()
+        if networks:
+            if isinstance(networks, list):
+                params['networks'] = networks
         j, r = self.request('POST', 'machines', data=params)
         if r.status_code >= 400:
             print(j, file=sys.stderr)
@@ -775,4 +778,52 @@ class DataCenter(object):
         return Machine(datacenter=self, machine_id=machine_id, 
                 credentials=credentials)
     
+    def networks(self, search=None, fields=('name,')):
+        """
+        ::
 
+            GET /:login/networks
+
+        :param search: optionally filter (locally) with a regular expression
+            search on the listed fields
+        :type search: :py:class:`basestring` that compiles as a regular
+            expression
+
+        :param fields: filter on the listed fields (defaulting to
+            ``name``)
+        :type fields: :py:class:`list` of :py:class:`basestring`\s
+
+        :Returns: network available in this datacenter
+        :rtype: :py:class:`list` of :py:class:`dict`\s
+        """
+
+        j, _ = self.request('GET', 'networks')
+        if search:
+            return list(search_dicts(j, search, fields))
+        else:
+            return j
+
+    def images(self, search=None, fields=('name,')):
+        """
+        ::
+
+            GET /:login/images
+
+        :param search: optionally filter (locally) with a regular expression
+            search on the listed fields
+        :type search: :py:class:`basestring` that compiles as a regular
+            expression
+
+        :param fields: filter on the listed fields (defaulting to
+            ``name``)
+        :type fields: :py:class:`list` of :py:class:`basestring`\s
+
+        :Returns: network available in this datacenter
+        :rtype: :py:class:`list` of :py:class:`dict`\s
+        """
+
+        j, _ = self.request('GET', 'images')
+        if search:
+            return list(search_dicts(j, search, fields))
+        else:
+            return j
