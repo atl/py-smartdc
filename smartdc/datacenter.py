@@ -781,49 +781,55 @@ class DataCenter(object):
     def networks(self, search=None, fields=('name,')):
         """
         ::
-
+        
             GET /:login/networks
-
+        
         :param search: optionally filter (locally) with a regular expression
             search on the listed fields
         :type search: :py:class:`basestring` that compiles as a regular
             expression
-
+        
         :param fields: filter on the listed fields (defaulting to
             ``name``)
         :type fields: :py:class:`list` of :py:class:`basestring`\s
-
+        
         :Returns: network available in this datacenter
         :rtype: :py:class:`list` of :py:class:`dict`\s
         """
-
+        
         j, _ = self.request('GET', 'networks')
         if search:
             return list(search_dicts(j, search, fields))
         else:
             return j
-
-    def images(self, search=None, fields=('name,')):
+    
+    def images(self, name=None, os=None, version=None):
         """
         ::
-
+        
             GET /:login/images
-
-        :param search: optionally filter (locally) with a regular expression
-            search on the listed fields
-        :type search: :py:class:`basestring` that compiles as a regular
-            expression
-
-        :param fields: filter on the listed fields (defaulting to
-            ``name``)
-        :type fields: :py:class:`list` of :py:class:`basestring`\s
-
-        :Returns: network available in this datacenter
+        
+        :param name: match on the listed name
+        :type name: :py:class:`basestring`
+        
+        :param os: match on the selected os
+        :type name: :py:class:`basestring`
+        
+        :param version: match on the selected version
+        :type version: :py:class:`basestring`
+        
+        :Returns: available machine images in this datacenter
         :rtype: :py:class:`list` of :py:class:`dict`\s
         """
-
-        j, _ = self.request('GET', 'images')
-        if search:
-            return list(search_dicts(j, search, fields))
-        else:
-            return j
+        
+        data = {}
+        if name:
+            data['name'] = name
+        if os:
+            data['os'] = os
+        if version:
+            data['version'] = version
+        j, _ = self.request('GET', 'images', data=data)
+        
+        return j
+    
