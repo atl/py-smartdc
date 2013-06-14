@@ -12,12 +12,14 @@ import requests
 from http_signature.requests_auth import HTTPSignatureAuth
 
 from .machine import Machine
+from ._version import get_versions
+__version__ = get_versions()['version']
+del get_versions
 
 __all__ = ['DataCenter', 'DEBUG_CONFIG', 'KNOWN_LOCATIONS', 
             'TELEFONICA_LOCATIONS', 'DEFAULT_LOCATION']
 
 API_HOST_SUFFIX = '.api.joyentcloud.com'
-API_VERSION = '~6.5'
 
 KNOWN_LOCATIONS = {
     u'us-east-1': u'https://us-east-1.api.joyentcloud.com',
@@ -38,8 +40,7 @@ DEFAULT_LOCATION = 'us-west-1'
 DEFAULT_HEADERS = {
     'Accept':        'application/json',
     'Content-Type':  'application/json; charset=UTF-8',
-    'X-Api-Version':  API_VERSION,
-    'User-Agent':    'py-smartdc'
+    'User-Agent':    'py-smartdc (%s)' % __version__
 }
 
 DEBUG_CONFIG = {'verbose': sys.stderr}
@@ -64,6 +65,8 @@ class DataCenter(object):
     requests it, and only accesses the REST API on method calls (never on 
     attribute access).
     """
+    API_VERSION = '7.0'
+    
     def __init__(self, location=None, key_id=None, secret='~/.ssh/id_rsa', 
                 headers=None, login=None, config=None, known_locations=None,
                 allow_agent=False, verify=True, verbose=None):
@@ -134,6 +137,7 @@ class DataCenter(object):
         else:
             self.auth = None
         self.default_headers = DEFAULT_HEADERS
+        self.default_headers['X-Api-Version'] = self.API_VERSION
         if headers:
             self.default_headers.update(headers)
         if login:
