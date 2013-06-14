@@ -6,6 +6,8 @@ Changes
 * This supports SmartDC API Version 7.0 by default
 * Added list_networks, list_images methods
 * ``create_machine()`` now accepts a network parameter
+* TODO: implement machine methods like audit and rename
+* TODO: test listimages call for filtering
 
 0.1.13 (2013-0n-mm)
 ~~~~~~~~~~~~~~~~~~~
