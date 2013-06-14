@@ -53,14 +53,6 @@ entities from these representations or pass the dicts themselves to methods
 that refer to these entities. The name, id, or URN -- as appropriate -- is 
 extracted and passed to the CloudAPI.
 
-Identifying individual datasets, as it turns out, doesn't require a fully 
-qualified URN: the CloudAPI currently appears to be clever enough to resolve 
-an ambiguous URN to the most recent one. Handy.
-
-::
-
-    latest64 = east.dataset('sdc:sdc:base64:')
-
 ``py-smartdc`` defines a few convenience functions beyond the ones offering 
 raw results directly from the CloudAPI, such as filtering through available 
 packages or datasets to return the default assigned by the datacenter::
@@ -70,9 +62,11 @@ packages or datasets to return the default assigned by the datacenter::
 ...or locally filtering for packages or datasets that match a regular 
 expression::
 
-    sdc.packages('^X{1,2}L')
+    sdc.packages('-highcpu-.+-smartos')
     
     east.datasets('base(64)?:')
+    
+    a_base = east.datasets('base(64)?:')[0]
 
 Instantiating machines
 ----------------------
@@ -83,20 +77,21 @@ and a unique name will always be defined if you omit one. However, besides
 valuing convenience and terseness, this python package is also about
 exercising fine control::
 
-    test_machine = east.create_machine(name='test-machine', dataset=latest64,
-                    package='Small 1GB', boot_script='./test-script.sh', 
+    test_machine = east.create_machine(name='test-machine', dataset=a_base, 
+                    boot_script='./test-script.sh', 
+                    package='g3-standard-0.25-smartos', 
                     tags={'type':'test'})
 
-Note that this illustrates some of the flexibility of py-smartdc. The 
-``dataset`` parameter happens to be the ``dict`` we got from by querying the 
-CloudAPI, but the ``create_machine`` method extracts the appropriate URN from 
-the ``dict``. More conventionally, the ``package`` parameter is identified by 
-a string, the name of the bundle of machine resources. We upload the 
-previously-saved ``boot_script``, and add a tag to the machine, so we can quickly 
-identify test instances.
+Note that this illustrates some of the flexibility of py-smartdc. The
+``dataset`` parameter happens to be an arbitrary ``dict`` we got from by
+querying the CloudAPI, but use within the ``create_machine`` method extracts
+the appropriate URN from the ``dict``. More conventionally, the ``package``
+parameter is identified by a string, the name of the bundle of machine
+resources. We upload the previously-saved ``boot_script``, and add a tag to
+the machine, so we can quickly identify test instances.
 
 .. Note:: Although boot scripts are tremendously useful, the SMF service that
-   runs the boot script will kill processes that exceed 60 seconds execution
+   runs the boot script will kill processes that exceed 300 seconds execution
    time, so this is not necessarily the best vehicle for long ``pkgin``
    installations, for example.
 

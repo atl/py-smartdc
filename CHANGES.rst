@@ -1,10 +1,11 @@
 Changes
 -------
 
-0.1.13 (2013-0n-mm)
+0.1.13 (2013-06-13)
 ~~~~~~~~~~~~~~~~~~~
 * Changes to allow for connections to vmwebadm hubs
 * Be resilient to IP addresses not being present immediately on creation
+* Adapt documentation to allow for late v6.5 API deployment changes
 
 0.1.12 (2013-01-08)
 ~~~~~~~~~~~~~~~~~~~

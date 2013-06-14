@@ -86,8 +86,8 @@ of 0.03USD::
     
     sdc.datasets()
     
-    sm = sdc.create_machine(name='test', dataset='sdc:sdc:standard:',
-          package='Extra Small 512 MB')
+    sm = sdc.create_machine(name='test', dataset='sdc:sdc:standard:1.0.7',
+          package='g3-standard-0.25-smartos')
     
     sm.poll_until('running')
     
