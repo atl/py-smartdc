@@ -57,13 +57,13 @@ Python SmartDataCenter Links
 .. _ssh: http://pypi.python.org/pypi/ssh
 .. _paramiko: http://pypi.python.org/pypi/paramiko
 .. _Python SmartDataCenter Tutorial: 
-    http://packages.python.org/smartdc/tutorial.html
+    http://pythonhosted.org/smartdc/tutorial.html
 .. _smartdc in PyPI: http://pypi.python.org/pypi/smartdc
 .. _http_signature in PyPI: http://pypi.python.org/pypi/http_signature
 .. _http_signature: `http_signature in PyPI`_
 .. _py-http-signature at GitHub: https://github.com/atl/py-http-signature
 .. _py-smartdc at GitHub: https://github.com/atl/py-smartdc
-.. _py-smartdc Documentation: http://packages.python.org/smartdc/
+.. _py-smartdc Documentation: http://pythonhosted.org/smartdc/
 .. _Telefónica's InstantServers: http://cloud.telefonica.com/instantservers/
 
 Installation
