@@ -423,25 +423,6 @@ class DataCenter(object):
             return list(search_dicts(j, search, fields))
         else:
             return j
-
-    def default_dataset(self):
-        """
-        ::
-        
-            GET /:login/datasets
-        
-        :Returns: the default dataset for this datacenter
-        :rtype: :py:class:`dict` or ``None``
-        
-        Requests all the datasets in this datacenter, filters for the default, 
-        and returns the corresponding :py:class:`dict`, if a default has been 
-        defined.
-        """
-        sets = filter(itemgetter('default'), self.datasets())
-        if sets:
-            return sets[0]
-        else:
-            return None
     
     def dataset(self, dataset_id):
         """
@@ -463,7 +444,8 @@ class DataCenter(object):
         j, _ = self.request('GET', 'datasets/' + str(dataset_id))
         return j
 
-    def packages(self, search=None, fields=('name',)):
+    def packages(self, name=None, memory=None, disk=None, swap=None,
+                version=None, vcpus=None, group=None):
         """
         ::
         
@@ -481,11 +463,23 @@ class DataCenter(object):
             available in this datacenter.
         :rtype: :py:class:`list` of :py:class:`dict`\s
         """
-        j, _ = self.request('GET', 'packages')
-        if search:
-            return list(search_dicts(j, search, fields))
-        else:
-            return j
+        params = {}
+        if name:
+            params['name'] = name
+        if memory:
+            params['memory'] = memory
+        if disk:
+            params['disk'] = disk
+        if swap:
+            params['swap'] = swap
+        if version:
+            params['version'] = version
+        if vcpus:
+            params['vcpus'] = vcpus
+        if group:
+            params['group'] = group
+        j, _ = self.request('GET', 'packages', params=params)
+        return j
     
     def default_package(self):
         """
@@ -499,7 +493,8 @@ class DataCenter(object):
         Requests all the packages in this datacenter, filters for the default, 
         and returns the corresponding dict, if a default has been defined.
         """
-        packages = filter(itemgetter('default'), self.packages())
+        packages = [pk for pk in self.packages() 
+                        if pk.get('default') == 'true']
         if packages:
             return packages[0]
         else:
@@ -521,7 +516,7 @@ class DataCenter(object):
         value.
         """
         if isinstance(name, dict):
-            name = name['name']
+            name = name.get('id', name.get('name'))
         j, _ = self.request('GET', 'packages/' + str(name))
         return j
     
@@ -731,7 +726,8 @@ class DataCenter(object):
         """
         params = {}
         if name:
-            assert re.match(r'[a-zA-Z0-9]([a-zA-Z0-9\-\.]*[a-zA-Z0-9])?$', name), "Illegal name"
+            assert re.match(r'[a-zA-Z0-9]([a-zA-Z0-9\-\.]*[a-zA-Z0-9])?$',
+                name), "Illegal name"
             params['name'] = name
         if package:
             if isinstance(package, dict):
@@ -803,6 +799,18 @@ class DataCenter(object):
         else:
             return j
     
+    def network(self, identifier):
+        """
+        ::
+        
+            GET /:login/networks/:id
+        
+        """
+        if isinstance(identifier, dict):
+            identifier = identifier.get('id')
+        j, _ = self.request('GET', 'networks/' + str(identifier))
+        return j
+    
     def images(self, name=None, os=None, version=None):
         """
         ::
@@ -822,14 +830,29 @@ class DataCenter(object):
         :rtype: :py:class:`list` of :py:class:`dict`\s
         """
         
-        data = {}
+        params = {}
         if name:
-            data['name'] = name
+            params['name'] = name
         if os:
-            data['os'] = os
+            params['os'] = os
         if version:
-            data['version'] = version
-        j, _ = self.request('GET', 'images', data=data)
+            params['version'] = version
+        j, _ = self.request('GET', 'images', params=params)
         
         return j
+    
+    def image(self, identifier):
+        """
+        ::
+        
+            GET /:login/images/:id
+        
+        """
+        
+        if isinstance(identifier):
+            identifier = identifier.get('id', '')
+        j, _ = self.request('GET', 'images/' + str(identifier))
+        
+        return j
+    
     

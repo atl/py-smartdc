@@ -1,15 +1,17 @@
 Changes
 -------
 
-0.2.0 (2013-0n-mm)
+0.2.0 (2013-06-dd)
 ~~~~~~~~~~~~~~~~~~
-* This supports SmartDC API Version 7.0 by default
-* Added list_networks, list_images methods
-* ``create_machine()`` now accepts a network parameter
-* TODO: implement machine methods like audit and rename
-* TODO: test listimages call for filtering
+This is an initial release to accommodate demand for basic SDC API v7.0 features. Further work is to come.
 
-0.1.13 (2013-0n-mm)
+* Support SmartDC API Version 7.0 by default
+* Add legacy mode for places where version 6.5 calls are necessary -- calling a v7.0 machine in v6.5 mode will lead to unexpected results.
+* Added list/get networks, list/get images methods
+* Support new API-level filtering for listing packages and images
+* ``create_machine()`` now accepts a network parameter
+
+0.1.13 (2013-06-13)
 ~~~~~~~~~~~~~~~~~~~
 * Changes to allow for connections to vmwebadm hubs
 * Be resilient to IP addresses not being present immediately on creation
