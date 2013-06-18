@@ -10,6 +10,7 @@ This is an initial release to accommodate demand for basic SDC API v7.0 features
 * Added list/get networks, list/get images methods
 * Support new REST API-level filtering for listing packages and images
 * ``create_machine()`` now accepts a network parameter
+* Eliminated the previously-deprecated ``DataCenter(config=)`` parameter
 
 0.1.13 (2013-06-13)
 ~~~~~~~~~~~~~~~~~~~

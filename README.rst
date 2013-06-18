@@ -78,7 +78,7 @@ Quickstart
 
 This requires a Joyent Public Cloud account with valid payment information and
 at least one SSH key uploaded. The example as presented should cost a maximum
-of 0.03USD::
+of 0.01USD::
 
     from smartdc import DataCenter
     

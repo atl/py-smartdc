@@ -13,6 +13,7 @@ Documentation
    tutorial
    datacenter
    machine
+   legacy
    history
 
 
