@@ -1,7 +1,11 @@
 from __future__ import print_function
-from .datacenter import *
+from .datacenter import DataCenter
 
 class LegacyDataCenter(DataCenter):
+    """
+    This class provides bare bones support for older versions of the 
+    SmartDataCenter API.
+    """
     API_VERSION = '~6.5'
     
     def api(self):

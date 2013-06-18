@@ -15,7 +15,7 @@ from ._version import get_versions
 __version__ = get_versions()['version']
 del get_versions
 
-__all__ = ['DataCenter', 'DEBUG_CONFIG', 'KNOWN_LOCATIONS', 
+__all__ = ['DataCenter', 'KNOWN_LOCATIONS', 
             'TELEFONICA_LOCATIONS', 'DEFAULT_LOCATION']
 
 API_HOST_SUFFIX = '.api.joyentcloud.com'
@@ -42,8 +42,6 @@ DEFAULT_HEADERS = {
     'User-Agent':    'py-smartdc (%s)' % __version__
 }
 
-DEBUG_CONFIG = {'verbose': sys.stderr}
-
 
 def search_dicts(dicts, predicate, fields):
     matcher = re.compile(predicate, re.IGNORECASE)
@@ -67,7 +65,7 @@ class DataCenter(object):
     API_VERSION = '7.0'
     
     def __init__(self, location=None, key_id=None, secret='~/.ssh/id_rsa', 
-                headers=None, login=None, config=None, known_locations=None,
+                headers=None, login=None, known_locations=None,
                 allow_agent=False, verify=True, verbose=None):
         """
         A :py:class:`smartdc.datacenter.DataCenter` object may be instantiated 
@@ -89,9 +87,6 @@ class DataCenter(object):
         
         :param login: user path in SmartDC
         :type login: :py:class:`basestring`
-        
-        :param config: Requests-style configuration [deprecated]
-        :type config: :py:class:`dict`
         
         :param known_locations: keys-to-URLs mapping used by `location` 
         :type known_locations: :py:class:`dict`
@@ -123,12 +118,7 @@ class DataCenter(object):
         """
         self.location = location or DEFAULT_LOCATION
         self.known_locations = known_locations or KNOWN_LOCATIONS
-        if verbose is None and config and config.get('verbose'):
-            self.verbose = config.get('verbose')
-            warn("DataCenter: config= will be eliminated in "
-                "favor of verbose=", FutureWarning, stacklevel=2)
-        else:
-            self.verbose = verbose and sys.stderr
+        self.verbose = verbose and sys.stderr
         self.verify = verify
         if key_id and secret:
             self.auth = HTTPSignatureAuth(key_id=key_id, secret=secret,
@@ -424,14 +414,14 @@ class DataCenter(object):
         else:
             return j
     
-    def dataset(self, dataset_id):
+    def dataset(self, identifier):
         """
         ::
         
             GET /:login/datasets/:id
         
-        :param dataset_id: unique ID or URN for a dataset
-        :type dataset_id: :py:class:`basestring` or :py:class:`dict`
+        :param identifier: unique ID or URN for a dataset
+        :type identifier: :py:class:`basestring` or :py:class:`dict`
         
         :rtype: :py:class:`dict`
         
@@ -439,9 +429,9 @@ class DataCenter(object):
         also prefix-matched. If passed a dict that contains an `urn` or `id` 
         key, it uses the respective value as the identifier.
         """
-        if isinstance(dataset_id, dict):
-            dataset_id = dataset_id.get('urn', dataset_id['id'])
-        j, _ = self.request('GET', 'datasets/' + str(dataset_id))
+        if isinstance(identifier, dict):
+            identifier = identifier.get('id', identifier['urn'])
+        j, _ = self.request('GET', 'datasets/' + str(identifier))
         return j
 
     def packages(self, name=None, memory=None, disk=None, swap=None,
@@ -451,13 +441,26 @@ class DataCenter(object):
         
             GET /:login/packages
         
-        :param search: optionally filter (locally) with a regular expression 
-            search on the listed fields
-        :type search: :py:class:`basestring` that compiles as a regular 
-            expression
+        :param name: the label associated with the resource package
+        :type name: :py:class:`basestring`
         
-        :param fields: filter on the listed fields (defaulting to ``name``\)
-        :type fields: :py:class:`list` of :py:class:`basestring`\s
+        :param memory: amount of RAM (in MiB) that the package provisions
+        :type memory: :py:class:`int`
+        
+        :param disk: amount of disk storage (in MiB) the package provisions
+        :type disk: :py:class:`int`
+        
+        :param swap: amount of swap (in MiB) the package provisions
+        :type swap: :py:class:`int`
+        
+        :param version: the version identifier associated with the package
+        :type version: :py:class:`basestring`
+        
+        :param vcpus: the number of virtual CPUs provisioned with the package
+        :type vcpus: :py:class:`int`
+        
+        :param group: the group to which the package belongs
+        :type group: :py:class:`basestring`
         
         :Returns: packages (machine "sizes", with resource types and values) 
             available in this datacenter.
@@ -680,7 +683,7 @@ class DataCenter(object):
     
     def create_machine(self, name=None, package=None, dataset=None,
             metadata=None, tags=None, boot_script=None, credentials=False,
-            networks=None):
+            image=None, networks=None):
         """
         ::
         
@@ -698,8 +701,12 @@ class DataCenter(object):
         :param package: cluster of resource values identified by name
         :type package: :py:class:`basestring` or :py:class:`dict`
         
+        :param image: an identifier for the base operating system image
+            (formerly a ``dataset``)
+        :type image: :py:class:`basestring` or :py:class:`dict`
+        
         :param dataset: base operating system image identified by a globally 
-            unique ID or URN
+            unique ID or URN (deprecated)
         :type dataset: :py:class:`basestring` or :py:class:`dict`
         
         :param metadata: keys & values with arbitrary supplementary 
@@ -718,9 +725,9 @@ class DataCenter(object):
         
         :rtype: :py:class:`smartdc.machine.Machine`
         
-        If `package` or `dataset` are passed a :py:class:`dict` containing a 
-        `name` key (in the case of `package`) or a `urn` or `id` key (in the 
-        case of `dataset`), it passes the corresponding value. The server API 
+        If `package`, `image`, or `dataset` are passed a :py:class:`dict` containing a 
+        `name` key (in the case of `package`) or an `id` key (in the case of
+        `image` or `dataset`), it passes the corresponding value. The server API 
         appears to resolve incomplete or ambiguous dataset URNs with the 
         highest version number.
         """
@@ -733,9 +740,13 @@ class DataCenter(object):
             if isinstance(package, dict):
                 package = package['name']
             params['package'] = package
-        if dataset:
+        if image:
+            if isinstance(image, dict):
+                image = image['id']
+            params['image'] = image
+        if dataset and not image:
             if isinstance(dataset, dict):
-                dataset = dataset.get('urn', dataset['id'])
+                dataset = dataset.get('id', dataset['urn'])
             params['dataset'] = dataset
         if metadata:
             for k, v in metadata.items():
@@ -749,6 +760,8 @@ class DataCenter(object):
         if networks:
             if isinstance(networks, list):
                 params['networks'] = networks
+            elif isinstance(networks, basestring):
+                params['networks'] = [networks]
         j, r = self.request('POST', 'machines', data=params)
         if r.status_code >= 400:
             print(j, file=sys.stderr)
@@ -805,7 +818,15 @@ class DataCenter(object):
         
             GET /:login/networks/:id
         
+        :param identifier: match on the listed network identifier
+        :type identifier: :py:class:`basestring` or :py:class:`dict`
+        
+        :Returns: characteristics of the requested network
+        :rtype: :py:class:`dict`
+        
+        Either a string or a dictionary with an ``id`` key may be passed in.
         """
+        
         if isinstance(identifier, dict):
             identifier = identifier.get('id')
         j, _ = self.request('GET', 'networks/' + str(identifier))
@@ -821,7 +842,7 @@ class DataCenter(object):
         :type name: :py:class:`basestring`
         
         :param os: match on the selected os
-        :type name: :py:class:`basestring`
+        :type os: :py:class:`basestring`
         
         :param version: match on the selected version
         :type version: :py:class:`basestring`
@@ -847,9 +868,17 @@ class DataCenter(object):
         
             GET /:login/images/:id
         
+        :param identifier: match on the listed image identifier
+        :type identifier: :py:class:`basestring` or :py:class:`dict`
+        
+        :Returns: the details of the given image matching the identifier
+        :rtype: :py:class:`dict`
+        
+        A string or a dictionary containing an ``id`` key may be
+        passed in.
         """
         
-        if isinstance(identifier):
+        if isinstance(identifier, dict):
             identifier = identifier.get('id', '')
         j, _ = self.request('GET', 'images/' + str(identifier))
         

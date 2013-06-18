@@ -1,9 +1,9 @@
 Changes
 -------
 
-0.2.0 (2013-06-dd)
+0.2.0 (2013-06-17)
 ~~~~~~~~~~~~~~~~~~
-This is an initial release to accommodate demand for basic SDC API v7.0 features. Further work is to come, and the API and features are to be considered unstable and in flux.
+This is an initial release to accommodate demand for basic SDC API v7.0 features. Further work is to come, so the API and features are to be considered unstable and in flux.
 
 * Support SmartDC API Version 7.0 by default
 * Add legacy mode for places where version 6.5 calls are necessary -- calling a v7.0 machine in v6.5 mode will lead to unexpected results.
