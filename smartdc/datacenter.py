@@ -177,7 +177,7 @@ class DataCenter(object):
     @property
     def url(self):
         """Base URL for SmartDC requests"""
-        return '{base_url}/{login}/'.format(base_url=self.base_url, 
+        return '{base_url}/{login}'.format(base_url=self.base_url, 
             login=self.login)
     
     @property
@@ -286,7 +286,7 @@ class DataCenter(object):
         :Returns: all public keys on record for the authenticated account.
         :rtype: :py:class:`list` of :py:class:`dict`\s
         """
-        j, _ = self.request('GET', 'keys')
+        j, _ = self.request('GET', '/keys')
         return j
     
     def key(self, key_id):
@@ -301,7 +301,7 @@ class DataCenter(object):
         :returns: details of the key
         :rtype: :py:class:`dict`
         """
-        j, _ = self.request('GET', 'keys/' + str(key_id))
+        j, _ = self.request('GET', '/keys/' + str(key_id))
         return j
     
     def add_key(self, key_id, key):
@@ -319,7 +319,7 @@ class DataCenter(object):
         Uploads a public key to be added to the account's credentials.
         """
         data = {'name': str(key_id), 'key': str(key)}
-        j, _ = self.request('POST', 'keys', data=data)
+        j, _ = self.request('POST', '/keys', data=data)
         return j
     
     def delete_key(self, key_id):
@@ -333,7 +333,7 @@ class DataCenter(object):
         
         Deletes an SSH key from the server identified by `key_id`.
         """
-        j, r = self.request('DELETE', 'keys/' + str(key_id))
+        j, r = self.request('DELETE', '/keys/' + str(key_id))
         r.raise_for_status()
         return j
     
@@ -364,7 +364,7 @@ class DataCenter(object):
         This method also updates the local `known_locations` attribute based 
         upon this information.
         """
-        j, _ = self.request('GET', 'datacenters')
+        j, _ = self.request('GET', '/datacenters')
         self.known_locations.update(j)
         return j
     
@@ -408,7 +408,7 @@ class DataCenter(object):
             datacenter 
         :rtype: :py:class:`list` of :py:class:`dict`\s
         """
-        j, _ = self.request('GET', 'datasets')
+        j, _ = self.request('GET', '/datasets')
         if search:
             return list(search_dicts(j, search, fields))
         else:
@@ -431,7 +431,7 @@ class DataCenter(object):
         """
         if isinstance(identifier, dict):
             identifier = identifier.get('id', identifier['urn'])
-        j, _ = self.request('GET', 'datasets/' + str(identifier))
+        j, _ = self.request('GET', '/datasets/' + str(identifier))
         return j
 
     def packages(self, name=None, memory=None, disk=None, swap=None,
@@ -481,7 +481,7 @@ class DataCenter(object):
             params['vcpus'] = vcpus
         if group:
             params['group'] = group
-        j, _ = self.request('GET', 'packages', params=params)
+        j, _ = self.request('GET', '/packages', params=params)
         return j
     
     def default_package(self):
@@ -520,7 +520,7 @@ class DataCenter(object):
         """
         if isinstance(name, dict):
             name = name.get('id', name.get('name'))
-        j, _ = self.request('GET', 'packages/' + str(name))
+        j, _ = self.request('GET', '/packages/' + str(name))
         return j
     
     def num_machines(self, machine_type=None, dataset=None, state=None, 
@@ -555,7 +555,7 @@ class DataCenter(object):
             owned by the user at this datacenter
         :rtype: :py:class:`int`
         """
-        _, r = self.request('HEAD', 'machines')
+        _, r = self.request('HEAD', '/machines')
         num = r.headers.get('x-resource-count', 0)
         return int(num)
     
@@ -580,7 +580,7 @@ class DataCenter(object):
             machine_id = machine_id['id']
         if credentials:
             params['credentials'] = True
-        j, _ = self.request('GET', 'machines/' + str(machine_id), 
+        j, _ = self.request('GET', '/machines/' + str(machine_id), 
                 params=params)
         return j
     
@@ -667,7 +667,7 @@ class DataCenter(object):
             offset = 0
         machines = []
         while True:
-            j, r = self.request('GET', 'machines', params=params)
+            j, r = self.request('GET', '/machines', params=params)
             machines.extend(j)
             if not paged:
                 query_limit = int(r.headers['x-query-limit'])
@@ -806,7 +806,7 @@ class DataCenter(object):
         :rtype: :py:class:`list` of :py:class:`dict`\s
         """
         
-        j, _ = self.request('GET', 'networks')
+        j, _ = self.request('GET', '/networks')
         if search:
             return list(search_dicts(j, search, fields))
         else:
@@ -829,7 +829,7 @@ class DataCenter(object):
         
         if isinstance(identifier, dict):
             identifier = identifier.get('id')
-        j, _ = self.request('GET', 'networks/' + str(identifier))
+        j, _ = self.request('GET', '/networks/' + str(identifier))
         return j
     
     def images(self, name=None, os=None, version=None):
@@ -858,7 +858,7 @@ class DataCenter(object):
             params['os'] = os
         if version:
             params['version'] = version
-        j, _ = self.request('GET', 'images', params=params)
+        j, _ = self.request('GET', '/images', params=params)
         
         return j
     
@@ -880,7 +880,7 @@ class DataCenter(object):
         
         if isinstance(identifier, dict):
             identifier = identifier.get('id', '')
-        j, _ = self.request('GET', 'images/' + str(identifier))
+        j, _ = self.request('GET', '/images/' + str(identifier))
         
         return j
     

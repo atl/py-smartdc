@@ -157,7 +157,7 @@ class Machine(object):
         Convenience property to insert the id into a relative path for 
         requests.
         """
-        return 'machines/{id}'.format(id=self.id)
+        return '/machines/{id}'.format(id=self.id)
     
     @property
     def public_ips(self):

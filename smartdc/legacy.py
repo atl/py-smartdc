@@ -12,7 +12,7 @@ class LegacyDataCenter(DataCenter):
         raise RuntimeError('Method no longer supported by SDC')
     
     def packages(self, search=None, fields=('name',)):
-        j, _ = self.request('GET', 'packages')
+        j, _ = self.request('GET', '/packages')
         if search:
             return list(search_dicts(j, search, fields))
         else:
