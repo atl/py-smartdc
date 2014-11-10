@@ -22,6 +22,8 @@ API_HOST_SUFFIX = '.api.joyentcloud.com'
 
 KNOWN_LOCATIONS = {
     u'us-east-1': u'https://us-east-1.api.joyentcloud.com',
+    u'us-east-2': u'https://us-east-2.api.joyentcloud.com',
+    u'us-east-3': u'https://us-east-3.api.joyentcloud.com',
     u'us-sw-1':   u'https://us-sw-1.api.joyentcloud.com',
     u'us-west-1': u'https://us-west-1.api.joyentcloud.com',
     u'eu-ams-1':  u'https://eu-ams-1.api.joyentcloud.com',
@@ -42,6 +44,21 @@ DEFAULT_HEADERS = {
     'User-Agent':    'py-smartdc (%s)' % __version__
 }
 
+def deprecated(func):
+    '''This is a decorator which can be used to mark functions
+    as deprecated. It will result in a warning being emitted
+    when the function is used.
+    
+    https://wiki.python.org/moin/PythonDecoratorLibrary#Generating_Deprecation_Warnings
+    '''
+    def new_func(*args, **kwargs):
+        warn("Call to deprecated function {}.".format(func.__name__),
+                      category=DeprecationWarning)
+        return func(*args, **kwargs)
+    new_func.__name__ = func.__name__
+    new_func.__doc__ = func.__doc__
+    new_func.__dict__.update(func.__dict__)
+    return new_func
 
 def search_dicts(dicts, predicate, fields):
     matcher = re.compile(predicate, re.IGNORECASE)
@@ -62,7 +79,7 @@ class DataCenter(object):
     requests it, and only accesses the REST API on method calls (never on 
     attribute access).
     """
-    API_VERSION = '7.0'
+    API_VERSION = '~7.2'
     
     def __init__(self, location=None, key_id=None, secret='~/.ssh/id_rsa', 
                 headers=None, login=None, known_locations=None,
@@ -257,8 +274,12 @@ class DataCenter(object):
         else:
             return (None, resp)
     
+    @deprecated
     def api(self):
         """
+        .. warning:: Deprecated: will be withdrawn since JPC doesn't appear 
+           to return the nice documentation object any more
+        
         ::
         
             GET /
@@ -276,6 +297,90 @@ class DataCenter(object):
             resp.raise_for_status()
         if resp.content:
             return json.loads(resp.content)
+    
+    @deprecated
+    def me(self):
+        "legacy alias for account"
+        return self.account()
+    
+    def account(self):
+        """
+        ::
+        
+            GET /:login
+        
+        :Returns: basic information about the authenticated account
+        :rtype: :py:class:`dict`
+        """
+        j, _ = self.request('GET', '')
+        if 'login' in j and self.login == 'my':
+            self.login = j['login']
+        return j
+    
+    def update_account(self, email=None, company_name=None, first_name=None, 
+            last_name=None, address=None, postal_code=None, city=None,
+            state=None, country=None, phone=None):
+        """
+        ::
+        
+            POST /:login
+        
+        :param email: Email address
+        :type email: :py:class:`basestring`
+        
+        :param company_name: Company name
+        :type company_name: :py:class:`basestring`
+        
+        :param first_name: First name
+        :type first_name: :py:class:`basestring`
+        
+        :param last_name: Last name
+        :type last_name: :py:class:`basestring`
+        
+        :param address: Address
+        :type address: :py:class:`basestring`
+        
+        :param postal_code: Postal code
+        :type postal_code: :py:class:`basestring`
+        
+        :param city: City
+        :type city: :py:class:`basestring`
+        
+        :param state: State
+        :type state: :py:class:`basestring`
+        
+        :param country: Country
+        :type country: :py:class:`basestring`
+        
+        :param phone: Phone
+        :type phone: :py:class:`basestring`
+        
+        :Returns: a dictionary with updated account info
+        :rtype: :py:class:`dict`
+        """
+        params = {}
+        if email:
+            params['email'] = email
+        if company_name:
+            params['companyName'] = company_name
+        if first_name:
+            params['firstName'] = first_name
+        if last_name:
+            params['lastName'] = last_name
+        if address:
+            params['address'] = address
+        if postal_code:
+            params['postalCode'] = postal_code
+        if city:
+            params['city'] = city
+        if state:
+            params['state'] = state
+        if country:
+            params['country'] = country
+        if phone:
+            params['phone'] = phone
+        j, _ = self.request('POST', '', params=params)
+        return j
     
     def keys(self):
         """
@@ -335,20 +440,6 @@ class DataCenter(object):
         """
         j, r = self.request('DELETE', '/keys/' + str(key_id))
         r.raise_for_status()
-        return j
-    
-    def me(self):
-        """
-        ::
-        
-            GET /:login
-        
-        :Returns: basic information about the authenticated account
-        :rtype: :py:class:`dict`
-        """
-        j, _ = self.request('GET', '')
-        if 'login' in j and self.login == 'my':
-            self.login = j['login']
         return j
     
     def datacenters(self):
@@ -832,7 +923,8 @@ class DataCenter(object):
         j, _ = self.request('GET', '/networks/' + str(identifier))
         return j
     
-    def images(self, name=None, os=None, version=None):
+    def images(self, name=None, os=None, version=None, 
+                public=None, state=None, owner=None, type=None):
         """
         ::
         
@@ -847,6 +939,18 @@ class DataCenter(object):
         :param version: match on the selected version
         :type version: :py:class:`basestring`
         
+        :param public: match on the visibility
+        :type public: :py:class:`basestring` ("public"/"private")
+        
+        :param state: Filter on image state. By default only active images are shown. Use "all" to list all images.
+        :type state: :py:class:`basestring`
+        
+        :param owner: match on the owner UUID
+        :type owner: :py:class:`basestring`
+        
+        :param machinetype: match on the selected type (e.g., "smartmachine")
+        :type machinetype: :py:class:`basestring`
+        
         :Returns: available machine images in this datacenter
         :rtype: :py:class:`list` of :py:class:`dict`\s
         """
@@ -858,6 +962,14 @@ class DataCenter(object):
             params['os'] = os
         if version:
             params['version'] = version
+        if public:
+            params['public'] = public
+        if state:
+            params['state'] = state
+        if owner:
+            params['owner'] = owner
+        if machinetype:
+            params['type'] = machinetype
         j, _ = self.request('GET', '/images', params=params)
         
         return j
@@ -884,4 +996,24 @@ class DataCenter(object):
         
         return j
     
-    
+    def delete_image(self, identifier):
+        """
+        ::
+        
+            DELETE /:login/images/:id
+        
+        :param identifier: match on the listed image identifier
+        :type identifier: :py:class:`basestring` or :py:class:`dict`
+        
+        A string or a dictionary containing an ``id`` key may be
+        passed in. Will raise an error if the response was an error.
+        
+        """
+        if isinstance(identifier, dict):
+            identifier = identifier.get('id', '')
+        j, r = self.request('DELETE', '/images/' + str(identifier))
+        r.raise_for_status()
+        
+        return j
+        
+    # TODO: ExportImage, CreateImageFromMachine, UpdateImage
